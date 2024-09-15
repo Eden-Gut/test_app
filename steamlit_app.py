@@ -42,10 +42,13 @@ def clean_date_format(df, column):
 
 # העלאת קובץ CSV
 uploaded_file = st.file_uploader("Upload your CSV file", type=["csv"])
-if uploaded_file:
-    df = pd.read_csv(uploaded_file)
-    st.write("Here is the raw data:")
-    st.write(df)
+if uploaded_file is None:
+    st.info("Upload a file through config, icon="!")
+    st.stop()
+df = pd.read_csv(uploaded_file)
+st.write("Here is the raw data:")
+st.write(df)
+
 
     # סרגל כלים צדדי
     steps = ["Duplicate Detection", "Anomaly Detection", "Fix Missing Values", "Normalization", "Date Cleaning"]
