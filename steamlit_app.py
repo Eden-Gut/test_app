@@ -11,7 +11,7 @@ def fuzzy_duplicate_check(df, column, threshold):
             yield idx, row[column], similar_entries
 
 # העלאת קובץ CSV
-uploaded_file = st.file_uploader("Upload your CSV file", type=["csv"])
+uploaded_file = st.file_uploader("Upload your CSV file!!!!!!!", type=["csv"])
 if uploaded_file:
     df = pd.read_csv(uploaded_file)
     st.write("Here is the raw data:")
