@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 from fuzzywuzzy import process
 
-
+st.set_page_config(layout="wide")
 # פונקציה לזיהוי כפילויות
 def fuzzy_duplicate_check(df, column, threshold):
     for idx, row in df.iterrows():
