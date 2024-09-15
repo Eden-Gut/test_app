@@ -3,19 +3,6 @@ import pandas as pd
 import numpy as np
 from fuzzywuzzy import process
 
-# הגדרת עיצוב ורוחב מלא דרך config.toml
-# config.toml
-"""
-[theme]
-primaryColor = "#1E90FF"
-backgroundColor = "#F0F2F6"
-secondaryBackgroundColor = "#FFFFFF"
-textColor = "#000000"
-font = "sans serif"
-
-[layout]
-wide = true
-"""
 
 # פונקציה לזיהוי כפילויות
 def fuzzy_duplicate_check(df, column, threshold):
