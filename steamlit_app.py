@@ -15,38 +15,32 @@ def fuzzy_duplicate_check(df, column, threshold):
 uploaded_file = st.file_uploader("Upload your CSV file", type=["csv"])
 if uploaded_file:
     df = pd.read_csv(uploaded_file)
-    st.write("Here is the raw data:")
     
-    # הצגת הטבלה במלוא הרוחב
-    st.dataframe(df, use_container_width=True)
+    # הצגת הטבלה עם אפשרות להרחיב ולהצמצם
+    with st.expander("Data Preview", expanded=False):
+        st.dataframe(df, use_container_width=True)
 
-    # סינון עמודות להצגה
-    selected_columns = st.multiselect("Select columns to display", options=df.columns, default=df.columns)
-    filtered_df = df[selected_columns]
-    
-    # הצגת טבלה מסוננת על פי העמודות שנבחרו
-    st.dataframe(filtered_df, use_container_width=True)
-
-    # סרגל כלים עם כפתורים בצד
+    # סרגל כלים בצד עם כותרות שניתן ללחוץ עליהן
     st.sidebar.title("Data Cleaning Steps")
-    step = st.session_state.get("step", 1)  # הגדרת השלב הנוכחי בעזרת session_state
+    
+    step = st.session_state.get("step", 1)
 
-    # כפתורים עבור כל שלב, כאשר השלב הנוכחי מודגש
-    if st.sidebar.button("Step 1: Duplicate Detection", key="step1", disabled=(step == 1)):
-        step = 1
-    if st.sidebar.button("Step 2: Anomaly Detection", key="step2", disabled=(step == 2)):
-        step = 2
-    if st.sidebar.button("Step 3: Fix Missing Values", key="step3", disabled=(step == 3)):
-        step = 3
-    if st.sidebar.button("Step 4: Normalization", key="step4", disabled=(step == 4)):
-        step = 4
-    if st.sidebar.button("Step 5: Date Cleaning", key="step5", disabled=(step == 5)):
-        step = 5
+    # שלבי העבודה ככותרות עם הדגשת השלב הנוכחי
+    def sidebar_step(label, step_number, current_step):
+        if step_number == current_step:
+            st.sidebar.markdown(f"*:red[{label}]*")  # השלב הנוכחי בצבע אדום
+        else:
+            if st.sidebar.button(label):
+                st.session_state["step"] = step_number
 
-    # עדכון של השלב הנוכחי בזיכרון
-    st.session_state["step"] = step
+    sidebar_step("Step 1: Duplicate Detection", 1, step)
+    sidebar_step("Step 2: Anomaly Detection", 2, step)
+    sidebar_step("Step 3: Fix Missing Values", 3, step)
+    sidebar_step("Step 4: Normalization", 4, step)
+    sidebar_step("Step 5: Date Cleaning", 5, step)
 
-    # טיפול לפי השלב הנבחר
+    # התוכן העיקרי לפי השלב הנבחר
+    step = st.session_state.get("step", 1)
     if step == 1:
         st.write("### Step 1: Detecting duplicates")
         column = st.selectbox("Select the column to check for duplicates:", df.columns)
