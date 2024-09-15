@@ -44,7 +44,7 @@ def clean_date_format(df, column):
 uploaded_file = st.file_uploader("Upload your CSV file", type=["csv"])
 if uploaded_file:
     df = pd.read_csv(uploaded_file)
-    with st.expander("Data Preview")
+    with st.expander("Data Preview"):
        st.write(df)
 
     # סרגל כלים צדדי
