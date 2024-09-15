@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 from fuzzywuzzy import process
 
-st.set_page_config(layout="wide")
 # פונקציה לזיהוי כפילויות
 def fuzzy_duplicate_check(df, column, threshold):
     for idx, row in df.iterrows():
@@ -12,47 +11,43 @@ def fuzzy_duplicate_check(df, column, threshold):
         if similar_entries:
             yield idx, row[column], similar_entries
 
-# פונקציה לזיהוי אנומליות
-def find_anomalies(df, column):
-    threshold = 3  # ערכים עם Z-Score מעל 3 נחשבים חריגים
-    z_scores = np.abs((df[column] - df[column].mean()) / df[column].std())
-    anomalies = df[z_scores > threshold]
-    return anomalies
-
-# פונקציה לתיקון ערכים חסרים
-def fix_missing_values(df):
-    for column in df.columns:
-        if df[column].isnull().sum() > 0:
-            if df[column].dtype == np.number:
-                df[column].fillna(df[column].mean(), inplace=True)
-            else:
-                df[column].fillna(df[column].mode()[0], inplace=True)
-    return df
-
-# פונקציה לנורמליזציה של מחרוזות
-def normalize_strings(df, columns):
-    for column in columns:
-        df[column] = df[column].str.lower().str.strip()
-    return df
-
-# פונקציה לניקוי והמרת תאריכים
-def clean_date_format(df, column):
-    df[column] = pd.to_datetime(df[column], errors='coerce').dt.strftime('%Y-%m-%d')
-    return df
-
 # העלאת קובץ CSV
 uploaded_file = st.file_uploader("Upload your CSV file", type=["csv"])
 if uploaded_file:
     df = pd.read_csv(uploaded_file)
-    with st.expander("Data Preview"):
-       st.write(df)
+    st.write("Here is the raw data:")
+    
+    # הצגת הטבלה במלוא הרוחב
+    st.dataframe(df, use_container_width=True)
 
-    # סרגל כלים צדדי
-    steps = ["Duplicate Detection", "Anomaly Detection", "Fix Missing Values", "Normalization", "Date Cleaning"]
-    selected_step = st.sidebar.radio("Select a step", steps)
+    # סינון עמודות להצגה
+    selected_columns = st.multiselect("Select columns to display", options=df.columns, default=df.columns)
+    filtered_df = df[selected_columns]
+    
+    # הצגת טבלה מסוננת על פי העמודות שנבחרו
+    st.dataframe(filtered_df, use_container_width=True)
 
-    # שלב 1: זיהוי כפילויות
-    if selected_step == "Duplicate Detection":
+    # סרגל כלים עם כפתורים בצד
+    st.sidebar.title("Data Cleaning Steps")
+    step = st.session_state.get("step", 1)  # הגדרת השלב הנוכחי בעזרת session_state
+
+    # כפתורים עבור כל שלב, כאשר השלב הנוכחי מודגש
+    if st.sidebar.button("Step 1: Duplicate Detection", key="step1", disabled=(step == 1)):
+        step = 1
+    if st.sidebar.button("Step 2: Anomaly Detection", key="step2", disabled=(step == 2)):
+        step = 2
+    if st.sidebar.button("Step 3: Fix Missing Values", key="step3", disabled=(step == 3)):
+        step = 3
+    if st.sidebar.button("Step 4: Normalization", key="step4", disabled=(step == 4)):
+        step = 4
+    if st.sidebar.button("Step 5: Date Cleaning", key="step5", disabled=(step == 5)):
+        step = 5
+
+    # עדכון של השלב הנוכחי בזיכרון
+    st.session_state["step"] = step
+
+    # טיפול לפי השלב הנבחר
+    if step == 1:
         st.write("### Step 1: Detecting duplicates")
         column = st.selectbox("Select the column to check for duplicates:", df.columns)
         threshold = st.slider("Select the similarity threshold (0-100):", 0, 100, 85)
@@ -70,50 +65,3 @@ if uploaded_file:
                     if st.button(f"Save changes to row {similar_index}", key=f"save_button_{similar_index}"):
                         df.at[similar_index, column] = edit_value
                         st.success(f"Row {similar_index} updated successfully!")
-
-    # שלב 2: זיהוי אנומליות
-    elif selected_step == "Anomaly Detection":
-        st.write("### Step 2: Detecting anomalies")
-        column = st.selectbox("Select the column to check for anomalies:", df.select_dtypes(include=[np.number]).columns)
-
-        anomalies = find_anomalies(df, column)
-        if not anomalies.empty:
-            st.write("Anomalies found:")
-            st.write(anomalies)
-        else:
-            st.write("No anomalies detected.")
-
-    # שלב 3: תיקון ערכים חסרים
-    elif selected_step == "Fix Missing Values":
-        st.write("### Step 3: Fixing missing values")
-        df = fix_missing_values(df)
-        st.write("Missing values have been fixed.")
-        st.write(df)
-
-    # שלב 4: נורמליזציה
-    elif selected_step == "Normalization":
-        st.write("### Step 4: Normalizing data")
-        text_columns = st.multiselect("Select columns to normalize (text only):", df.select_dtypes(include=[object]).columns)
-
-        if text_columns:
-            df = normalize_strings(df, text_columns)
-            st.write("Data normalized successfully.")
-            st.write(df)
-
-    # שלב 5: ניקוי והמרת פורמט תאריכים
-    elif selected_step == "Date Cleaning":
-        st.write("### Step 5: Cleaning and formatting dates")
-        date_column = st.selectbox("Select the date column:", df.select_dtypes(include=[object]).columns)
-
-        df = clean_date_format(df, date_column)
-        st.write("Date formats cleaned and converted.")
-        st.write(df)
-
-    # הורדת הדאטה בסוף התהליך
-    csv = df.to_csv(index=False).encode('utf-8')
-    st.download_button(
-        label="Download cleaned data",
-        data=csv,
-        file_name='cleaned_data.csv',
-        mime='text/csv',
-    )
