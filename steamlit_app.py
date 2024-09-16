@@ -34,8 +34,8 @@ def change_column_format(df, column):
     # עדכון הטבלה לאחר שינוי הפורמט
     st.dataframe(df, use_container_width=True)
 
-# פונקציה להצגת סטטיסטיקות (Sum, Mean, Median, Std Dev) בכרטיסים
-def display_statistics(df, column):
+# פונקציה להצגת סטטיסטיקות (Sum, Mean, Median, Std Dev) בכרטיסים או הערכים הנפוצים ביותר לטקסט
+def display_statistics_or_top_values(df, column):
     col_data = df[column]
     
     # אם העמודה היא מספרית (כולל מטבע)
@@ -45,18 +45,24 @@ def display_statistics(df, column):
         median_val = col_data.median()
         std_dev = col_data.std()
         
-        # שימוש בסט Columns להצגת הכרטיסים
-        col1, col2, col3, col4 = st.columns(4)
-
-        # הצגת כרטיסים עם ערכים
+        # שימוש בסט Columns להצגת הכרטיסים בשני שורות של שני עמודות כל אחת
+        col1, col2 = st.columns(2)
         with col1:
             st.metric(label="Sum", value=f"{total_sum:,.2f}")
         with col2:
             st.metric(label="Mean", value=f"{mean_val:,.2f}")
+        
+        col3, col4 = st.columns(2)
         with col3:
             st.metric(label="Median", value=f"{median_val:,.2f}")
         with col4:
             st.metric(label="Std Dev", value=f"{std_dev:,.2f}")
+    
+    # אם העמודה היא טקסטואלית, נציג את 4 הערכים הנפוצים ביותר
+    elif pd.api.types.is_string_dtype(col_data):
+        top_values = col_data.value_counts().head(4)
+        st.write("### Top 4 Most Frequent Values")
+        st.table(top_values)
 
 # פונקציה לניתוח עמודה (מציג נתונים סטטיסטיים בסיסיים עם גרפים)
 def analyze_column(df, column):
@@ -65,88 +71,93 @@ def analyze_column(df, column):
     
     # מציג כמה ערכים יוניקים, ערכים חסרים, סך הכל ערכים
     total_values = col_data.size
-    unique_values = col_data[col_data.duplicated(keep=False) == False].nunique()
-    distinct_values = col_data.nunique()
+    unique_values = col_data.nunique()
     missing_values = col_data.isna().sum()
     
     # חישוב אחוזים
     unique_percentage = (unique_values / total_values) * 100
-    distinct_percentage = (distinct_values / total_values) * 100
     missing_percentage = (missing_values / total_values) * 100
     
     # גרף עמודות להצגת ערכים יוניקים, ערכים חסרים וערכים כוללים
-    labels = ['Unique Values', 'Distinct Values', 'Missing Values']
-    values = [unique_values, distinct_values, missing_values]
-    percentages = [unique_percentage, distinct_percentage, missing_percentage]
+    labels = ['Unique Values', 'Missing Values']
+    values = [unique_values, missing_values]
+    percentages = [unique_percentage, missing_percentage]
     
-    fig1 = px.bar(x=labels, y=values, title='Bar Chart of Column Analysis', labels={'x': 'Category', 'y': 'Count'})
-    fig1.update_traces(text=[f'{v} ({p:.2f}%)' for v, p in zip(values, percentages)], textposition='outside')
-    fig1.update_layout(hovermode="x unified")
-    st.plotly_chart(fig1)
+    # יצירת תצוגה מסודרת של גרף לצד Expander עם הערכים
+    col1, col2 = st.columns([2, 1])
+    with col1:
+        fig1 = px.bar(x=labels, y=values, title='Bar Chart of Column Analysis', labels={'x': 'Category', 'y': 'Count'})
+        fig1.update_traces(text=[f'{v} ({p:.2f}%)' for v, p in zip(values, percentages)], textposition='outside')
+        fig1.update_layout(hovermode="x unified")
+        st.plotly_chart(fig1)
     
-    # יצירת expanders להצגת רשימות הערכים
-    with st.expander("Unique Values"):
-        st.write(col_data[col_data.duplicated(keep=False) == False].dropna().tolist())
+    with col2:
+        # יצירת expanders להצגת רשימות הערכים
+        with st.expander("Unique Values"):
+            st.write(col_data.dropna().unique().tolist())
+        
+        with st.expander("Missing Values"):
+            st.write(col_data[col_data.isna()].index.tolist())
     
-    with st.expander("Distinct Values"):
-        st.write(col_data.dropna().unique().tolist())
+    # הצגת היסטוגרמה לצד ריבועים סטטיסטיים או טופ ערכים
+    col3, col4 = st.columns(2)
+    with col3:
+        if pd.api.types.is_numeric_dtype(col_data):
+            fig2 = px.histogram(col_data.dropna(), nbins=20, title=f'Histogram of {column}')
+            fig2.update_layout(xaxis_title='Value', yaxis_title='Frequency')
+            st.plotly_chart(fig2)
     
-    with st.expander("Missing Values"):
-        st.write(col_data[col_data.isna()].index.tolist())
+    with col4:
+        display_statistics_or_top_values(df, column)
+
+# פונקציה להצגת השורות עם ערכים חסרים
+def show_missing_data(df):
+    st.write("### Handling Missing Values")
     
-    # הצגת היסטוגרמה רק עבור עמודות מספריות
-    if pd.api.types.is_numeric_dtype(col_data):
-        display_statistics(df, column)
-
-        # גרף היסטוגרמה להצגת הפיזור עבור עמודה מספרית
-        fig2 = px.histogram(col_data.dropna(), nbins=20, title=f'Histogram of {column}')
-        fig2.update_layout(xaxis_title='Value', yaxis_title='Frequency')
-        st.plotly_chart(fig2)
-
-# פונקציה לשמירת שינויים ולחזרה אחורה (Undo/Redo)
-history = []  # רשימת היסטוריה לשינויים
-undo_stack = []  # מחסנית לביצוע חזרה אחורה (Redo)
-
-def save_changes(df):
-    history.append(df.copy())
-    st.write("Changes saved.")
-
-def undo_changes():
-    if history:
-        undo_stack.append(history.pop())
-        st.write("Undo performed.")
-
-def redo_changes():
-    if undo_stack:
-        history.append(undo_stack.pop())
-        st.write("Redo performed.")
+    # הצגת שורות שיש בהן ערכים חסרים
+    missing_data = df[df.isnull().any(axis=1)]
+    if not missing_data.empty:
+        st.write("Rows with Missing Values:")
+        st.dataframe(missing_data)
+    
+    # אפשרות למלא ערכים חסרים
+    column = st.selectbox("Select column to fill missing values:", df.columns[df.isnull().any()])
+    
+    if column:
+        fill_option = st.selectbox("How would you like to fill the missing values?", ["Mean", "Median", "Mode", "Custom Value"])
+        
+        if fill_option == "Mean":
+            df[column].fillna(df[column].mean(), inplace=True)
+        elif fill_option == "Median":
+            df[column].fillna(df[column].median(), inplace=True)
+        elif fill_option == "Mode":
+            df[column].fillna(df[column].mode()[0], inplace=True)
+        elif fill_option == "Custom Value":
+            custom_value = st.text_input("Enter custom value:")
+            if custom_value:
+                df[column].fillna(custom_value, inplace=True)
+        
+        # הצגת הטבלה לאחר המילוי
+        st.write("### Data after handling missing values")
+        st.dataframe(df)
 
 # הגדרת מצב תצוגה רחב
 st.set_page_config(layout="wide")
 
-# Expander להעלאת קובץ
-with st.expander("Upload your CSV file", expanded=True):
-    uploaded_file = st.file_uploader("Upload your CSV file", type=["csv"])
+# העלאת קובץ CSV
+uploaded_file = st.file_uploader("Upload your CSV file", type=["csv"])
 
 if uploaded_file:
     df = pd.read_csv(uploaded_file)
-    history.append(df.copy())  # שמירה של המצב המקורי
     
-    # Expander ל-Data Preview
-    with st.expander("Data Preview", expanded=True):
-        st.write("### Data Preview")
-        selected_column = st.dataframe(df, use_container_width=True)
-
-    # כפתורי Undo ו-Redo מתחת ל-Data Preview
-    st.button("Undo", on_click=undo_changes)
-    st.button("Redo", on_click=redo_changes)
+    # הצגת ה-Data Preview
+    st.write("### Data Preview")
+    st.dataframe(df, use_container_width=True)
     
-    # הצגת העמודות לבחירה מתוך הרשימה הדינמית
-    st.write("### Click a Column for Analysis")
-    
-    # הצגת עמודות הדינמית מתוך Data Preview
+    # הצגת ניתוח של עמודות
     column = st.selectbox("Select a column to analyze:", df.columns)
     if column:
-        change_column_format(df, column)  # הפורמט ישפיע על הטבלה המוצגת
-        # הצגת ניתוח רק אם העמודה היא לא טקסט, אבל כל שאר הגרפים נשארים
         analyze_column(df, column)
+    
+    # הצגת חלק להתמודדות עם ערכים חסרים
+    show_missing_data(df)
