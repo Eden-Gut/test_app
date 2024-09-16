@@ -7,7 +7,7 @@ import plotly.express as px
 def display_statistics(df, column):
     col_data = df[column]
     
-    # אם העמודה היא מספרית
+    # אם העמודה היא מספרית (כולל מטבע)
     if pd.api.types.is_numeric_dtype(col_data):
         total_sum = col_data.sum()
         mean_val = col_data.mean()
@@ -63,11 +63,11 @@ def analyze_column(df, column):
     with st.expander("Missing Values"):
         st.write(col_data[col_data.isna()].index.tolist())
     
-    # אם העמודה היא מספרית, הצגת סטטיסטיקות
+    # הצגת היסטוגרמה רק עבור עמודות מספריות
     if pd.api.types.is_numeric_dtype(col_data):
         display_statistics(df, column)
 
-        # גרף היסטוגרמה להצגת הפיזור
+        # גרף היסטוגרמה להצגת הפיזור עבור עמודה מספרית
         fig2 = px.histogram(col_data.dropna(), nbins=20, title=f'Histogram of {column}')
         fig2.update_layout(xaxis_title='Value', yaxis_title='Frequency')
         st.plotly_chart(fig2)
@@ -81,6 +81,7 @@ def change_column_format(df, column):
     format_choice = st.selectbox("Choose format:", format_options)
     
     if format_choice == "Currency":
+        # המרה לפורמט מטבע
         df[column] = df[column].apply(lambda x: f"${x:,.2f}" if pd.api.types.is_numeric_dtype(df[column]) else x)
         st.write(f"Column '{column}' formatted as Currency.")
     
