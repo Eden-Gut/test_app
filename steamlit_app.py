@@ -129,7 +129,8 @@ if uploaded_file:
     with col1:
         # תצוגת הדאטה (Data Preview) שמתעדכנת עם שינויים
         st.write("### Data Preview")
-        st.dataframe(df, use_container_width=True)
+        dataframe_placeholder = st.empty()
+        dataframe_placeholder.dataframe(df, use_container_width=True)
 
         # כפתורי Undo ו-Redo
         st.button("Undo", on_click=undo_changes)
@@ -144,3 +145,4 @@ if uploaded_file:
         if column:
             analyze_column(df, column)
             change_column_format(df, column)
+            dataframe_placeholder.dataframe(df, use_container_width=True)
