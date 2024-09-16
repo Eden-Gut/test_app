@@ -117,25 +117,6 @@ def redo_changes():
 # הגדרת מצב תצוגה רחב
 st.set_page_config(layout="wide")
 
-# CSS להקפאת צד שמאל
-st.markdown("""
-    <style>
-    .fixed-table {
-        position: fixed;
-        top: 10px;
-        left: 10px;
-        width: 35%;
-        z-index: 100;
-        background-color: white;
-        padding: 10px;
-        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
-    }
-    .analysis {
-        margin-left: 38%; /* ייצור רווח מספיק מצד שמאל */
-    }
-    </style>
-""", unsafe_allow_html=True)
-
 # העלאת קובץ CSV
 uploaded_file = st.file_uploader("Upload your CSV file", type=["csv"])
 
@@ -143,23 +124,24 @@ if uploaded_file:
     df = pd.read_csv(uploaded_file)
     history.append(df.copy())  # שמירה של המצב המקורי
     
-    # תצוגת הדאטה (Data Preview) עם הקפאה בצד שמאל
-    st.markdown('<div class="fixed-table">', unsafe_allow_html=True)
-    st.write("### Data Preview")
-    selected_column = st.dataframe(df, use_container_width=True)
-    st.markdown('</div>', unsafe_allow_html=True)
+    # חלוקת המסך: חצי למסך הנתונים וחצי לניתוח
+    col1, col2 = st.columns([1, 1])
     
-    # כפתורי Undo ו-Redo בתוך הצד השמאלי
-    st.button("Undo", on_click=undo_changes)
-    st.button("Redo", on_click=redo_changes)
+    with col1:
+        # תצוגת הדאטה (Data Preview) שמתעדכנת עם שינויים
+        st.write("### Data Preview")
+        selected_column = st.dataframe(df, use_container_width=True)
+
+        # כפתורי Undo ו-Redo
+        st.button("Undo", on_click=undo_changes)
+        st.button("Redo", on_click=redo_changes)
     
-    # ניתוח בעמודה שנבחרה
-    st.markdown('<div class="analysis">', unsafe_allow_html=True)
-    st.write("### Click a Column for Analysis")
-    
-    # הצגת עמודות הדינמית מתוך Data Preview
-    column = st.selectbox("Select a column to analyze:", df.columns)
-    if column:
-        analyze_column(df, column)
-        change_column_format(df, column)
-    st.markdown('</div>', unsafe_allow_html=True)
+    with col2:
+        # הצגת העמודות לבחירה מתוך הרשימה הדינמית
+        st.write("### Click a Column for Analysis")
+        
+        # הצגת עמודות הדינמית מתוך Data Preview
+        column = st.selectbox("Select a column to analyze:", df.columns)
+        if column:
+            analyze_column(df, column)
+            change_column_format(df, column)
