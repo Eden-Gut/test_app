@@ -3,6 +3,34 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 
+# פונקציה לשינוי פורמט עמודות
+def change_column_format(df, column):
+    st.write("### Change Column Format")
+    
+    # אפשרויות לפורמט עמודה
+    format_options = ["None", "Currency", "Date", "Numeric", "Text"]
+    format_choice = st.selectbox("Choose format:", format_options)
+    
+    if format_choice == "Currency":
+        # המרה לפורמט מטבע כמו באקסל ($1,000.00)
+        df[column] = df[column].apply(lambda x: f"${x:,.2f}" if pd.api.types.is_numeric_dtype(df[column]) else x)
+        st.write(f"Column '{column}' formatted as Currency.")
+    
+    elif format_choice == "Date":
+        # המרה לפורמט תאריך (YYYY-MM-DD)
+        df[column] = pd.to_datetime(df[column], errors='coerce').dt.strftime('%Y-%m-%d')
+        st.write(f"Column '{column}' formatted as Date.")
+    
+    elif format_choice == "Numeric":
+        # המרה למספרים (החזרת פורמט מספרי רגיל)
+        df[column] = pd.to_numeric(df[column], errors='coerce')
+        st.write(f"Column '{column}' formatted as Numeric.")
+    
+    elif format_choice == "Text":
+        # המרה לפורמט טקסט
+        df[column] = df[column].astype(str)
+        st.write(f"Column '{column}' formatted as Text.")
+
 # פונקציה להצגת סטטיסטיקות (Sum, Mean, Median, Std Dev) בכרטיסים
 def display_statistics(df, column):
     col_data = df[column]
@@ -71,23 +99,6 @@ def analyze_column(df, column):
         fig2 = px.histogram(col_data.dropna(), nbins=20, title=f'Histogram of {column}')
         fig2.update_layout(xaxis_title='Value', yaxis_title='Frequency')
         st.plotly_chart(fig2)
-
-# פונקציה לשינוי פורמט עמודות
-def change_column_format(df, column):
-    st.write("### Change Column Format")
-    
-    # אפשרויות לפורמט עמודה
-    format_options = ["None", "Currency", "Text"]
-    format_choice = st.selectbox("Choose format:", format_options)
-    
-    if format_choice == "Currency":
-        # המרה לפורמט מטבע
-        df[column] = df[column].apply(lambda x: f"${x:,.2f}" if pd.api.types.is_numeric_dtype(df[column]) else x)
-        st.write(f"Column '{column}' formatted as Currency.")
-    
-    elif format_choice == "Text":
-        df[column] = df[column].astype(str)
-        st.write(f"Column '{column}' formatted as Text.")
 
 # פונקציה לשמירת שינויים ולחזרה אחורה (Undo/Redo)
 history = []  # רשימת היסטוריה לשינויים
