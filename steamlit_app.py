@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.patches import Patch
 
 # פונקציה לניתוח עמודה (מציג נתונים סטטיסטיים בסיסיים עם גרפים)
 def analyze_column(df, column):
@@ -16,11 +17,16 @@ def analyze_column(df, column):
     # גרף עוגה להצגת ערכים יוניקים וערכים חסרים בגודל קטן
     labels = ['Unique Values', 'Missing Values', 'Total Values']
     sizes = [col_data.nunique(), col_data.isna().sum(), col_data.size - col_data.isna().sum() - col_data.nunique()]
+    colors = ['#ff9999','#66b3ff','#99ff99']
     
-    fig1, ax1 = plt.subplots(figsize=(2, 2))  # גודל העוגה מוקטן
-    ax1.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90)
+    fig1, ax1 = plt.subplots(figsize=(4, 4))  # גודל העוגה מוקטן
+    wedges, texts, autotexts = ax1.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', startangle=90)
     ax1.axis('equal')  # שומר על העיגול
-    st.pyplot(fig1)
+
+    # הוספת tooltips
+    for wedge, label in zip(wedges, labels):
+        wedge.set_gid(label)
+    tooltip = st.pyplot(fig1)
     
     # אם העמודה היא מספרית
     if pd.api.types.is_numeric_dtype(col_data):
