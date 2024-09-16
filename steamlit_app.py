@@ -41,15 +41,36 @@ def analyze_column(df, column):
     
     # אם העמודה היא מספרית
     if pd.api.types.is_numeric_dtype(col_data):
-        st.write(f"Sum: {col_data.sum()}")
-        st.write(f"Mean: {col_data.mean()}")
-        st.write(f"Median: {col_data.median()}")
-        st.write(f"Standard deviation: {col_data.std()}")
+        display_statistics(df, column)
         
         # גרף היסטוגרמה להצגת הפיזור
         fig2 = px.histogram(col_data.dropna(), nbins=20, title=f'Histogram of {column}')
         fig2.update_layout(xaxis_title='Value', yaxis_title='Frequency')
         st.plotly_chart(fig2)
+
+# פונקציה להצגת סטטיסטיקות (Sum, Mean, Median, Std Dev) בכרטיסים
+def display_statistics(df, column):
+    col_data = df[column]
+    
+    # אם העמודה היא מספרית
+    if pd.api.types.is_numeric_dtype(col_data):
+        total_sum = col_data.sum()
+        mean_val = col_data.mean()
+        median_val = col_data.median()
+        std_dev = col_data.std()
+        
+        # שימוש בסט Columns להצגת הכרטיסים
+        col1, col2, col3, col4 = st.columns(4)
+
+        # הצגת כרטיסים עם ערכים
+        with col1:
+            st.metric(label="Sum", value=f"{total_sum:,.2f}")
+        with col2:
+            st.metric(label="Mean", value=f"{mean_val:,.2f}")
+        with col3:
+            st.metric(label="Median", value=f"{median_val:,.2f}")
+        with col4:
+            st.metric(label="Std Dev", value=f"{std_dev:,.2f}")
 
 # פונקציה לשינוי פורמט עמודות
 def change_column_format(df, column):
