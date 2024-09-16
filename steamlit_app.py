@@ -13,17 +13,17 @@ def analyze_column(df, column):
     st.write(f"Unique values: {col_data.nunique()}")
     st.write(f"Missing values: {col_data.isna().sum()}")
     
-    # גרף עוגה להצגת ערכים יוניקים וערכים חסרים
+    # גרף עוגה להצגת ערכים יוניקים וערכים חסרים בגודל קטן
     labels = ['Unique Values', 'Missing Values', 'Total Values']
     sizes = [col_data.nunique(), col_data.isna().sum(), col_data.size - col_data.isna().sum() - col_data.nunique()]
     
-    fig1, ax1 = plt.subplots()
+    fig1, ax1 = plt.subplots(figsize=(4, 4))  # גודל העוגה מוקטן
     ax1.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90)
     ax1.axis('equal')  # שומר על העיגול
     st.pyplot(fig1)
     
     # אם העמודה היא מספרית
-    if pd.api.types.is_numeric_dtype(col_data) and not col_data.astype(str).str.contains(r'\D').any():
+    if pd.api.types.is_numeric_dtype(col_data):
         st.write(f"Sum: {col_data.sum()}")
         st.write(f"Mean: {col_data.mean()}")
         st.write(f"Median: {col_data.median()}")
@@ -60,10 +60,6 @@ def change_column_format(df, column):
     elif format_choice == "Lowercase" and pd.api.types.is_string_dtype(df[column]):
         df[column] = df[column].str.lower()
         st.write(f"Column '{column}' formatted as Lowercase.")
-    
-    # עדכון הטבלה בצד שמאל
-    st.write("### Updated Data Preview")
-    st.dataframe(df, use_container_width=True)
 
 # פונקציה לשמירת שינויים ולחזרה אחורה (Undo/Redo)
 history = []  # רשימת היסטוריה לשינויים
@@ -102,12 +98,25 @@ if uploaded_file:
         st.button("Undo", on_click=undo_changes)
         st.button("Redo", on_click=redo_changes)
     
+    # ניתוח על פי לחיצה על כותרת עמודה
+    if 'selected_column' not in st.session_state:
+        st.session_state.selected_column = None
+
     with col2:
-        st.write("### Select a Column by Clicking its Header in Data Preview")
-        column = st.selectbox("Select a column to analyze:", df.columns, key="column_select")
-        
-        # ניתוח העמודה הנבחרת
-        analyze_column(df, column)
-        
-        # שינוי פורמט עמודה
-        change_column_format(df, column)
+        # המשתמש יכול ללחוץ על עמודה ב-Data Preview
+        st.write("### Click on a Column Header in Data Preview to Analyze")
+        if st.session_state.selected_column:
+            analyze_column(df, st.session_state.selected_column)
+            change_column_format(df, st.session_state.selected_column)
+
+# קליטה של לחיצה על כותרת עמודה ב-Data Preview
+@st.cache(allow_output_mutation=True)
+def get_dataframe():
+    return pd.DataFrame()
+
+df = get_dataframe()
+if not df.empty:
+    # לכידה של לחיצה על כותרת
+    clicked_column = st.experimental_data_editor(df, num_rows="dynamic")
+    if clicked_column:
+        st.session_state.selected_column = clicked_column
