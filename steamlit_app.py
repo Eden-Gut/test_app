@@ -145,3 +145,20 @@ if uploaded_file:
         if column:
             analyze_column(df, column)
             change_column_format(df, column)
+
+# הוספת CSS מותאם אישית
+st.markdown(
+    """
+    <style>
+    .fixed-table {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        width: 45%;
+        background-color: white;
+        z-index: 100;
+        padding: 10px;
+        border: 1px solid #ddd;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    </style>
