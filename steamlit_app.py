@@ -14,11 +14,6 @@ def analyze_column(df, column):
     distinct_values = col_data.nunique()
     missing_values = col_data.isna().sum()
     
-    st.write(f"Total values: {total_values}")
-    st.write(f"Unique values: {unique_values}")
-    st.write(f"Distinct values: {distinct_values}")
-    st.write(f"Missing values: {missing_values}")
-    
     # חישוב אחוזים
     unique_percentage = (unique_values / total_values) * 100
     distinct_percentage = (distinct_values / total_values) * 100
