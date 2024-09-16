@@ -132,6 +132,5 @@ if uploaded_file:
     column = st.selectbox("Select a column to analyze:", df.columns)
     if column:
         change_column_format(df, column)  # הפורמט ישפיע על הטבלה המוצגת
-        # הצגת ניתוח רק אם העמודה היא לא טקסט
-        if not pd.api.types.is_string_dtype(df[column]):
-            analyze_column(df, column)
+        # הצגת ניתוח רק אם העמודה היא לא טקסט, אבל כל שאר הגרפים נשארים
+        analyze_column(df, column)
