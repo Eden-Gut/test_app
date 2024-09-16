@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
-import plotly.graph_objects as go
 
 # פונקציה לניתוח עמודה (מציג נתונים סטטיסטיים בסיסיים עם גרפים)
 def analyze_column(df, column):
@@ -10,16 +9,23 @@ def analyze_column(df, column):
     st.write(f"### Analysis of '{column}'")
     
     # מציג כמה ערכים יוניקים, ערכים חסרים, סך הכל ערכים
-    st.write(f"Total values: {col_data.size}")
-    st.write(f"Unique values: {col_data.nunique()}")
-    st.write(f"Missing values: {col_data.isna().sum()}")
+    total_values = col_data.size
+    unique_values = col_data[col_data.duplicated(keep=False) == False].nunique()
+    distinct_values = col_data.nunique()
+    missing_values = col_data.isna().sum()
     
-    # גרף עוגה להצגת ערכים יוניקים וערכים חסרים בגודל קטן
-    labels = ['Unique Values', 'Missing Values', 'Total Values']
-    sizes = [col_data.nunique(), col_data.isna().sum(), col_data.size - col_data.isna().sum() - col_data.nunique()]
+    st.write(f"Total values: {total_values}")
+    st.write(f"Unique values: {unique_values}")
+    st.write(f"Distinct values: {distinct_values}")
+    st.write(f"Missing values: {missing_values}")
     
-    fig1 = go.Figure(data=[go.Pie(labels=labels, values=sizes, hole=.3)])
-    fig1.update_layout(title_text='Pie Chart of Column Analysis')
+    # גרף עמודות להצגת ערכים יוניקים, ערכים חסרים וערכים כוללים
+    labels = ['Unique Values', 'Distinct Values', 'Missing Values']
+    values = [unique_values, distinct_values, missing_values]
+    
+    fig1 = px.bar(x=labels, y=values, title='Bar Chart of Column Analysis', labels={'x': 'Category', 'y': 'Count'})
+    fig1.update_traces(text=values, textposition='outside')
+    fig1.update_layout(hovermode="x unified")
     st.plotly_chart(fig1)
     
     # אם העמודה היא מספרית
@@ -76,6 +82,9 @@ def redo_changes():
         history.append(undo_stack.pop())
         st.write("Redo performed.")
 
+# הגדרת מצב תצוגה רחב
+st.set_page_config(layout="wide")
+
 # העלאת קובץ CSV
 uploaded_file = st.file_uploader("Upload your CSV file", type=["csv"])
 
@@ -83,7 +92,7 @@ if uploaded_file:
     df = pd.read_csv(uploaded_file)
     history.append(df.copy())  # שמירה של המצב המקורי
     
-    # חלוקת המסך: שליש למסך הנתונים ושני שליש לניתוח
+    # חלוקת המסך: חצי למסך הנתונים וחצי לניתוח
     col1, col2 = st.columns([1, 1])
     
     with col1:
