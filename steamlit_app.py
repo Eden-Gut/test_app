@@ -30,6 +30,9 @@ def change_column_format(df, column):
         # המרה לפורמט טקסט
         df[column] = df[column].astype(str)
         st.write(f"Column '{column}' formatted as Text.")
+    
+    # עדכון הטבלה לאחר שינוי הפורמט
+    st.dataframe(df, use_container_width=True)
 
 # פונקציה להצגת סטטיסטיקות (Sum, Mean, Median, Std Dev) בכרטיסים
 def display_statistics(df, column):
