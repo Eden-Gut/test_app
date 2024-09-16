@@ -130,9 +130,7 @@ if uploaded_file:
     with col1:
         # תצוגת הדאטה (Data Preview) שמתעדכנת עם שינויים
         st.write("### Data Preview")
-        st.markdown('<div class="sticky-table">', unsafe_allow_html=True)
         st.dataframe(df, use_container_width=True)
-        st.markdown('</div>', unsafe_allow_html=True)
 
         # כפתורי Undo ו-Redo
         st.button("Undo", on_click=undo_changes)
@@ -147,19 +145,3 @@ if uploaded_file:
         if column:
             analyze_column(df, column)
             change_column_format(df, column)
-
-# הוספת CSS מותאם אישית
-st.markdown(
-    """
-    <style>
-    .sticky-table {
-        position: -webkit-sticky;
-        position: sticky;
-        top: 0;
-        background-color: white;
-        z-index: 100;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
