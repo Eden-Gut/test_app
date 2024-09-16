@@ -19,14 +19,30 @@ def analyze_column(df, column):
     st.write(f"Distinct values: {distinct_values}")
     st.write(f"Missing values: {missing_values}")
     
+    # חישוב אחוזים
+    unique_percentage = (unique_values / total_values) * 100
+    distinct_percentage = (distinct_values / total_values) * 100
+    missing_percentage = (missing_values / total_values) * 100
+    
     # גרף עמודות להצגת ערכים יוניקים, ערכים חסרים וערכים כוללים
     labels = ['Unique Values', 'Distinct Values', 'Missing Values']
     values = [unique_values, distinct_values, missing_values]
+    percentages = [unique_percentage, distinct_percentage, missing_percentage]
     
     fig1 = px.bar(x=labels, y=values, title='Bar Chart of Column Analysis', labels={'x': 'Category', 'y': 'Count'})
-    fig1.update_traces(text=values, textposition='outside')
+    fig1.update_traces(text=[f'{v} ({p:.2f}%)' for v, p in zip(values, percentages)], textposition='outside')
     fig1.update_layout(hovermode="x unified")
     st.plotly_chart(fig1)
+    
+    # יצירת expanders להצגת רשימות הערכים
+    with st.expander("Unique Values"):
+        st.write(col_data[col_data.duplicated(keep=False) == False].dropna().tolist())
+    
+    with st.expander("Distinct Values"):
+        st.write(col_data.dropna().unique().tolist())
+    
+    with st.expander("Missing Values"):
+        st.write(col_data[col_data.isna()].index.tolist())
     
     # אם העמודה היא מספרית
     if pd.api.types.is_numeric_dtype(col_data):
