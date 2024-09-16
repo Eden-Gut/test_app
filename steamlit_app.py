@@ -17,7 +17,7 @@ def analyze_column(df, column):
     labels = ['Unique Values', 'Missing Values', 'Total Values']
     sizes = [col_data.nunique(), col_data.isna().sum(), col_data.size - col_data.isna().sum() - col_data.nunique()]
     
-    fig1, ax1 = plt.subplots(figsize=(3, 3))  # גודל העוגה מוקטן
+    fig1, ax1 = plt.subplots(figsize=(2, 2))  # גודל העוגה מוקטן
     ax1.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90)
     ax1.axis('equal')  # שומר על העיגול
     st.pyplot(fig1)
