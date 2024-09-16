@@ -77,7 +77,7 @@ def change_column_format(df, column):
     st.write("### Change Column Format")
     
     # אפשרויות לפורמט עמודה
-    format_options = ["None", "Currency", "Date", "Uppercase", "Lowercase"]
+    format_options = ["None", "Currency", "Date", "Text"]
     format_choice = st.selectbox("Choose format:", format_options)
     
     if format_choice == "Currency":
@@ -88,13 +88,13 @@ def change_column_format(df, column):
         df[column] = pd.to_datetime(df[column], errors='coerce')
         st.write(f"Column '{column}' formatted as Date.")
     
-    elif format_choice == "Uppercase" and pd.api.types.is_string_dtype(df[column]):
-        df[column] = df[column].str.upper()
-        st.write(f"Column '{column}' formatted as Uppercase.")
+    elif format_choice == "Text":
+        df[column] = df[column].astype(str).str.replace(',', '')
+        st.write(f"Column '{column}' formatted as Text.")
     
-    elif format_choice == "Lowercase" and pd.api.types.is_string_dtype(df[column]):
-        df[column] = df[column].str.lower()
-        st.write(f"Column '{column}' formatted as Lowercase.")
+    # הצגת הדאטה המעודכן
+    st.write("### Updated Data Preview")
+    st.dataframe(df)
 
 # פונקציה לשמירת שינויים ולחזרה אחורה (Undo/Redo)
 history = []  # רשימת היסטוריה לשינויים
@@ -130,7 +130,9 @@ if uploaded_file:
     with col1:
         # תצוגת הדאטה (Data Preview) שמתעדכנת עם שינויים
         st.write("### Data Preview")
-        selected_column = st.dataframe(df, use_container_width=True)
+        st.markdown('<div class="sticky-table">', unsafe_allow_html=True)
+        st.dataframe(df, use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
         # כפתורי Undo ו-Redo
         st.button("Undo", on_click=undo_changes)
@@ -146,3 +148,18 @@ if uploaded_file:
             analyze_column(df, column)
             change_column_format(df, column)
 
+# הוספת CSS מותאם אישית
+st.markdown(
+    """
+    <style>
+    .sticky-table {
+        position: -webkit-sticky;
+        position: sticky;
+        top: 0;
+        background-color: white;
+        z-index: 100;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
