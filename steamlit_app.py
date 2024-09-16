@@ -124,16 +124,18 @@ def redo_changes():
 # הגדרת מצב תצוגה רחב
 st.set_page_config(layout="wide")
 
-# העלאת קובץ CSV
-uploaded_file = st.file_uploader("Upload your CSV file", type=["csv"])
+# Expander להעלאת קובץ
+with st.expander("Upload your CSV file", expanded=True):
+    uploaded_file = st.file_uploader("Upload your CSV file", type=["csv"])
 
 if uploaded_file:
     df = pd.read_csv(uploaded_file)
     history.append(df.copy())  # שמירה של המצב המקורי
     
-    # תצוגת הדאטה (Data Preview) מוצגת בראש הדף
-    st.write("### Data Preview")
-    selected_column = st.dataframe(df, use_container_width=True)
+    # Expander ל-Data Preview
+    with st.expander("Data Preview", expanded=True):
+        st.write("### Data Preview")
+        selected_column = st.dataframe(df, use_container_width=True)
 
     # כפתורי Undo ו-Redo מתחת ל-Data Preview
     st.button("Undo", on_click=undo_changes)
