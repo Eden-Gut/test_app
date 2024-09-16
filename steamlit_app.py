@@ -93,8 +93,7 @@ def change_column_format(df, column):
         st.write(f"Column '{column}' formatted as Text.")
     
     # הצגת הדאטה המעודכן
-    st.write("### Updated Data Preview")
-    st.dataframe(df)
+    st.dataframe(df, use_container_width=True)
 
 # פונקציה לשמירת שינויים ולחזרה אחורה (Undo/Redo)
 history = []  # רשימת היסטוריה לשינויים
