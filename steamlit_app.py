@@ -92,31 +92,18 @@ if uploaded_file:
     with col1:
         # תצוגת הדאטה (Data Preview) שמתעדכנת עם שינויים
         st.write("### Data Preview")
-        st.dataframe(df, use_container_width=True)
+        selected_column = st.dataframe(df, use_container_width=True)
 
         # כפתורי Undo ו-Redo
         st.button("Undo", on_click=undo_changes)
         st.button("Redo", on_click=redo_changes)
     
-    # ניתוח על פי לחיצה על כותרת עמודה
-    if 'selected_column' not in st.session_state:
-        st.session_state.selected_column = None
-
     with col2:
-        # המשתמש יכול ללחוץ על עמודה ב-Data Preview
-        st.write("### Click on a Column Header in Data Preview to Analyze")
-        if st.session_state.selected_column:
-            analyze_column(df, st.session_state.selected_column)
-            change_column_format(df, st.session_state.selected_column)
-
-# קליטה של לחיצה על כותרת עמודה ב-Data Preview
-@st.cache(allow_output_mutation=True)
-def get_dataframe():
-    return pd.DataFrame()
-
-df = get_dataframe()
-if not df.empty:
-    # לכידה של לחיצה על כותרת
-    clicked_column = st.experimental_data_editor(df, num_rows="dynamic")
-    if clicked_column:
-        st.session_state.selected_column = clicked_column
+        # הצגת העמודות לבחירה מתוך הרשימה הדינמית
+        st.write("### Click a Column for Analysis")
+        
+        # הצגת עמודות הדינמית מתוך Data Preview
+        column = st.selectbox("Select a column to analyze:", df.columns)
+        if column:
+            analyze_column(df, column)
+            change_column_format(df, column)
