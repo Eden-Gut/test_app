@@ -84,7 +84,7 @@ if uploaded_file:
     history.append(df.copy())  # שמירה של המצב המקורי
     
     # חלוקת המסך: שליש למסך הנתונים ושני שליש לניתוח
-    col1, col2 = st.columns([1, 2])
+    col1, col2 = st.columns([1, 1])
     
     with col1:
         # תצוגת הדאטה (Data Preview) שמתעדכנת עם שינויים
