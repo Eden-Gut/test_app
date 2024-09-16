@@ -1,7 +1,8 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
+import plotly.express as px
+import plotly.graph_objects as go
 
 # פונקציה לניתוח עמודה (מציג נתונים סטטיסטיים בסיסיים עם גרפים)
 def analyze_column(df, column):
@@ -17,10 +18,9 @@ def analyze_column(df, column):
     labels = ['Unique Values', 'Missing Values', 'Total Values']
     sizes = [col_data.nunique(), col_data.isna().sum(), col_data.size - col_data.isna().sum() - col_data.nunique()]
     
-    fig1, ax1 = plt.subplots(figsize=(1, 1))  # גודל העוגה מוקטן
-    ax1.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90)
-    ax1.axis('equal')  # שומר על העיגול
-    st.pyplot(fig1)
+    fig1 = go.Figure(data=[go.Pie(labels=labels, values=sizes, hole=.3)])
+    fig1.update_layout(title_text='Pie Chart of Column Analysis')
+    st.plotly_chart(fig1)
     
     # אם העמודה היא מספרית
     if pd.api.types.is_numeric_dtype(col_data):
@@ -30,12 +30,9 @@ def analyze_column(df, column):
         st.write(f"Standard deviation: {col_data.std()}")
         
         # גרף היסטוגרמה להצגת הפיזור
-        fig2, ax2 = plt.subplots()
-        ax2.hist(col_data.dropna(), bins=20, color='blue', edgecolor='black')
-        ax2.set_title(f'Histogram of {column}')
-        ax2.set_xlabel('Value')
-        ax2.set_ylabel('Frequency')
-        st.pyplot(fig2)
+        fig2 = px.histogram(col_data.dropna(), nbins=20, title=f'Histogram of {column}')
+        fig2.update_layout(xaxis_title='Value', yaxis_title='Frequency')
+        st.plotly_chart(fig2)
 
 # פונקציה לשינוי פורמט עמודות
 def change_column_format(df, column):
