@@ -56,7 +56,19 @@ def analyze_column(df, column):
     values = [unique_values, distinct_values]
     percentages = [unique_percentage, distinct_percentage]
     
-    col1, col2 = st.columns([2, 1])
+    # הצגת היסטוגרמה לצד הריבועים הסטטיסטיים
+    col3, col4 = st.columns([1, 1])
+    
+    with col3:
+        if pd.api.types.is_numeric_dtype(col_data):
+            fig2 = px.histogram(col_data.dropna(), nbins=20, title=f'Histogram of {column}')
+            fig2.update_layout(xaxis_title='Value', yaxis_title='Frequency')
+            st.plotly_chart(fig2)
+    
+    with col4:
+        display_statistics_or_top_values(df, column)
+
+  col1, col2 = st.columns([2, 1])
     
     with col1:
         fig1 = px.bar(x=labels, y=values, title='Bar Chart of Column Analysis', labels={'x': 'Category', 'y': 'Count'})
@@ -70,18 +82,6 @@ def analyze_column(df, column):
         
         with st.expander("Distinct Values"):
             st.write(col_data.drop_duplicates().unique().tolist())
-    
-    # הצגת היסטוגרמה לצד הריבועים הסטטיסטיים
-    col3, col4 = st.columns([1, 1])
-    
-    with col3:
-        if pd.api.types.is_numeric_dtype(col_data):
-            fig2 = px.histogram(col_data.dropna(), nbins=20, title=f'Histogram of {column}')
-            fig2.update_layout(xaxis_title='Value', yaxis_title='Frequency')
-            st.plotly_chart(fig2)
-    
-    with col4:
-        display_statistics_or_top_values(df, column)
 
 # פונקציה להצגת השורות עם ערכים חסרים
 def show_missing_data(df):
