@@ -38,6 +38,10 @@ def display_statistics_or_top_values(df, column):
         mean_val = col_data.mean()
         median_val = col_data.median()
         std_dev = col_data.std()
+        min_val = col_data.min()
+        max_val = col_data.max()
+        q25 = col_data.quantile(0.25)
+        q75 = col_data.quantile(0.75)
         
         col1, col2 = st.columns(2)
         with col1:
@@ -50,56 +54,68 @@ def display_statistics_or_top_values(df, column):
             st.metric(label="Median", value=f"{median_val:,.2f}")
         with col4:
             st.metric(label="Std Dev", value=f"{std_dev:,.2f}")
+        
+        col5, col6 = st.columns(2)
+        with col5:
+            st.metric(label="Min", value=f"{min_val:,.2f}")
+        with col6:
+            st.metric(label="Max", value=f"{max_val:,.2f}")
+        
+        col7, col8 = st.columns(2)
+        with col7:
+            st.metric(label="25th Percentile", value=f"{q25:,.2f}")
+        with col8:
+            st.metric(label="75th Percentile", value=f"{q75:,.2f}")
     
     elif pd.api.types.is_string_dtype(col_data):
-        top_values = col_data.value_counts().head(4)
-        col1, col2 = st.columns(2)
-        for i, (value, count) in enumerate(top_values.items()):
-            if i % 2 == 0:
-                with col1:
-                    st.metric(label=f"Value {i+1}", value=value)
-            else:
-                with col2:
-                    st.metric(label=f"Value {i+1}", value=value)
+        top_values = col_data.value_counts().head(5)
+        fig = px.pie(values=top_values.values, names=top_values.index, title="Top 5 Most Frequent Values")
+        st.plotly_chart(fig)
+        
+        st.write("### Top 5 Most Frequent Values")
+        for value, count in top_values.items():
+            st.write(f"{value}: {count} occurrences")
 
 # פונקציה לניתוח עמודה 
 def analyze_column(df, column):
     col_data = df[column]
     st.write(f"### Analysis of '{column}'")
     
-    total_values = col_data.size
-    unique_values = col_data.nunique()
-    missing_values = col_data.isna().sum()
+    if pd.api.types.is_numeric_dtype(col_data):
+        # הצגת סטטיסטיקות וגרף היסטוגרמה עבור עמודות מספריות
+        display_statistics_or_top_values(df, column)
+        fig = px.histogram(col_data.dropna(), nbins=20, title=f'Histogram of {column}')
+        fig.update_layout(xaxis_title='Value', yaxis_title='Frequency')
+        st.plotly_chart(fig)
     
-    unique_percentage = (unique_values / total_values) * 100
-    missing_percentage = (missing_values / total_values) * 100
-    
-    labels = ['Unique Values', 'Missing Values']
-    values = [unique_values, missing_values]
-    percentages = [unique_percentage, missing_percentage]
-    
-    col1, col2 = st.columns([2, 1])
-    with col1:
-        fig1 = px.bar(x=labels, y=values, title='Bar Chart of Column Analysis', labels={'x': 'Category', 'y': 'Count'})
-        fig1.update_traces(text=[f'{v} ({p:.2f}%)' for v, p in zip(values, percentages)], textposition='outside')
-        fig1.update_layout(hovermode="x unified")
-        st.plotly_chart(fig1)
-    
-    with col2:
-        with st.expander("Unique Values"):
-            st.write(col_data.dropna().unique().tolist())
+    elif pd.api.types.is_string_dtype(col_data):
+        # ניתוח עבור עמודות טקסטואליות
+        total_values = col_data.size
+        unique_values = col_data.nunique()
+        distinct_values = col_data.drop_duplicates().nunique()
         
-        with st.expander("Missing Values"):
-            st.write(col_data[col_data.isna()].index.tolist())
-    
-    col3, col4 = st.columns(2)
-    with col3:
-        if pd.api.types.is_numeric_dtype(col_data):
-            fig2 = px.histogram(col_data.dropna(), nbins=20, title=f'Histogram of {column}')
-            fig2.update_layout(xaxis_title='Value', yaxis_title='Frequency')
-            st.plotly_chart(fig2)
-    
-    with col4:
+        unique_percentage = (unique_values / total_values) * 100
+        distinct_percentage = (distinct_values / total_values) * 100
+        
+        labels = ['Unique Values', 'Distinct Values']
+        values = [unique_values, distinct_values]
+        percentages = [unique_percentage, distinct_percentage]
+        
+        col1, col2 = st.columns([2, 1])
+        with col1:
+            fig1 = px.bar(x=labels, y=values, title='Bar Chart of Column Analysis', labels={'x': 'Category', 'y': 'Count'})
+            fig1.update_traces(text=[f'{v} ({p:.2f}%)' for v, p in zip(values, percentages)], textposition='outside')
+            fig1.update_layout(hovermode="x unified")
+            st.plotly_chart(fig1)
+        
+        with col2:
+            with st.expander("Unique Values"):
+                st.write(col_data.dropna().unique().tolist())
+            
+            with st.expander("Distinct Values"):
+                st.write(col_data.drop_duplicates().unique().tolist())
+        
+        # הצגת הערכים הנפוצים ביותר
         display_statistics_or_top_values(df, column)
 
 # פונקציה להצגת השורות עם ערכים חסרים
