@@ -68,7 +68,7 @@ def analyze_column(df, column):
     with col4:
         display_statistics_or_top_values(df, column)
 
-  col1, col2 = st.columns([2, 1])
+    col1, col2 = st.columns([2, 1])
     
     with col1:
         fig1 = px.bar(x=labels, y=values, title='Bar Chart of Column Analysis', labels={'x': 'Category', 'y': 'Count'})
