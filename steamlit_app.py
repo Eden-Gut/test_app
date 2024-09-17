@@ -3,6 +3,20 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 
+# CSS להוספת רקע וגבול
+st.markdown(f"""
+    <style>
+    .metric-box {{
+        background-color: #e0f7fa;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+        text-align: center;
+        border: 2px solid #1E90FF; /* הוספת גבול בצבע כחול */
+    }}
+    </style>
+    """, unsafe_allow_html=True)
+
 # פונקציה לשינוי פורמט עמודות
 def change_column_format(df, column):
     st.write("### Change Column Format")
@@ -44,11 +58,15 @@ def display_statistics_or_top_values(df, column):
         q75 = col_data.quantile(0.75)
         
         col1, col2 = st.columns(2)
+          
         with col1:
+            st.markdown('<div class="metric-box">', unsafe_allow_html=True)
             st.metric(label="Sum", value=f"{total_sum:,.2f}")
+            st.markdown('</div>', unsafe_allow_html=True)
         with col2:
+            st.markdown('<div class="metric-box">', unsafe_allow_html=True)
             st.metric(label="Mean", value=f"{mean_val:,.2f}")
-        
+            st.markdown('</div>', unsafe_allow_html=True)
         col3, col4 = st.columns(2)
         with col3:
             st.metric(label="Median", value=f"{median_val:,.2f}")
