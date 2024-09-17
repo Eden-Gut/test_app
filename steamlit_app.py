@@ -120,8 +120,8 @@ def display_statistics_text(df, column):
         fig_bar.update_traces(text=[f'{v} ({p:.2f}%)' for v, p in zip(values, percentages)], textposition='outside')
         fig_bar.update_layout(
         hovermode="x unified",
-        width=600,  # רוחב הגרף
-        height=600,  # גובה הגרף
+        width=550,  # רוחב הגרף
+        height=550,  # גובה הגרף
     )
         fig_bar.update_traces(
         textfont_size=12  # גודל הגופן של הערכים
