@@ -3,6 +3,38 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 
+# הגדרת מצב תצוגה רחב
+st.set_page_config(layout="wide")
+st.markdown(
+    """
+    <style>
+    div[data-testid="stMetric"] {
+        background-color: #f5f5f5;
+        border: 2px solid #000000;
+        padding: 10px;
+        border-radius: 10px;
+        color: black;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center; /* כיוונון אנכי */
+        justify-content: center; /* כיוונון אופקי */
+        flex-direction: column;  /* מסדר את התוכן בכיוון עמודה */
+        align-items: center;     /* ממקם במרכז */
+        justify-content: center; /* ממקם במרכז */
+    }
+    div[data-testid="stMetricLabel"] {
+        font-size: 16px;   /* גודל הגופן של הכותרת */
+        font-weight: bold; /* הופך את הכותרת לבולטת */
+        margin-bottom: 5px; /* רווח קטן מתחת לכותרת */
+    }
+    div[data-testid="stMetricValue"] {
+        font-size: 24px;   /* גודל הגופן של הערך */
+        font-weight: bold; /* הערך גם יהיה בולט */
+    }
+    </style>
+    """, unsafe_allow_html=True
+)
+
 # פונקציה לשינוי פורמט עמודות
 def change_column_format(df, column):
     st.write("### Change Column Format")
@@ -137,8 +169,6 @@ def show_missing_data(df):
         st.write("### Data after handling missing values")
         st.dataframe(df)
 
-# הגדרת מצב תצוגה רחב
-st.set_page_config(layout="wide")
 
 # Expander להעלאת קובץ
 with st.expander("Upload your CSV file", expanded=True):
