@@ -3,6 +3,22 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 
+# הוספת CSS להוספת גבול למטריקות
+st.markdown(
+    """
+    <style>
+    div[data-testid="stMetric"] {
+        background-color: #f5f5f5;
+        border: 2px solid #000000;
+        padding: 10px;
+        border-radius: 10px;
+        color: black;
+        margin-bottom: 10px;
+    }
+    </style>
+    """, unsafe_allow_html=True
+)
+
 # פונקציה לשינוי פורמט עמודות
 def change_column_format(df, column):
     st.write("### Change Column Format")
@@ -46,11 +62,9 @@ def display_statistics_or_top_values(df, column):
         col1, col2 = st.columns(2)
           
         with col1:
-            
             st.metric(label="Sum", value=f"{total_sum:,.2f}")
           
         with col2:
-        
             st.metric(label="Mean", value=f"{mean_val:,.2f}")
        
         col3, col4 = st.columns(2)
