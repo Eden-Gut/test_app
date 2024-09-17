@@ -7,7 +7,6 @@ import plotly.express as px
 # הגדרת מצב תצוגה רחב
 st.set_page_config(layout="wide")
 
-# הוספת CSS להוספת גבול למטריקות
 st.markdown(
     """
     <style>
@@ -18,6 +17,9 @@ st.markdown(
         border-radius: 10px;
         color: black;
         margin-bottom: 10px;
+        display: flex;
+        align-items: center; /* כיוונון אנכי */
+        justify-content: center; /* כיוונון אופקי */
     }
     </style>
     """, unsafe_allow_html=True
