@@ -123,10 +123,10 @@ def display_statistics_text(df, column):
         width=500,  # רוחב הגרף
         height=500,  # גובה הגרף
     )
-    fig_bar.update_traces(
+        fig_bar.update_traces(
         textfont_size=12  # גודל הגופן של הערכים
     )
-    st.plotly_chart(fig_bar)
+        st.plotly_chart(fig_bar)
     
     with col3:
         with st.expander("Unique Values"):
