@@ -121,7 +121,7 @@ def display_statistics_text(df, column):
         fig_bar.update_layout(
         hovermode="x unified",
         width=550,  # רוחב הגרף
-        height=550,  # גובה הגרף
+        height=500,  # גובה הגרף
     )
         fig_bar.update_traces(
         textfont_size=12  # גודל הגופן של הערכים
