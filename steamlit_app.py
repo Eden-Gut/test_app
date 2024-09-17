@@ -8,19 +8,6 @@ import plotly.express as px
 st.markdown("""
 <style>
 
-[data-testid="block-container"] {
-    padding-left: 2rem;
-    padding-right: 2rem;
-    padding-top: 1rem;
-    padding-bottom: 0rem;
-    margin-bottom: -7rem;
-}
-
-[data-testid="stVerticalBlock"] {
-    padding-left: 0rem;
-    padding-right: 0rem;
-}
-
 [data-testid="stMetric"] {
     background-color: #393939;
     text-align: center;
