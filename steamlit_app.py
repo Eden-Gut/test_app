@@ -3,6 +3,10 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 
+
+# הגדרת מצב תצוגה רחב
+st.set_page_config(layout="wide")
+
 # הוספת CSS להוספת גבול למטריקות
 st.markdown(
     """
@@ -163,9 +167,6 @@ def show_missing_data(df):
         
         st.write("### Data after handling missing values")
         st.dataframe(df)
-
-# הגדרת מצב תצוגה רחב
-st.set_page_config(layout="wide")
 
 # Expander להעלאת קובץ
 with st.expander("Upload your CSV file", expanded=True):
