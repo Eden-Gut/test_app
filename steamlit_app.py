@@ -74,7 +74,7 @@ def display_statistics_numeric(df, column):
     q75 = col_data.quantile(0.75)
     
     # חלוקה לשלוש עמודות: שתיים לסטטיסטיקות, אחת להיסטוגרמה
-    col1, col2, col3 = st.columns([1, 1, 1])
+    col1, col2, col3 = st.columns([1, 1, 2])
       
     with col1:
         st.metric(label="Sum", value=f"{total_sum:,.2f}")
