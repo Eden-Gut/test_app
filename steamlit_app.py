@@ -149,3 +149,55 @@ if uploaded_file:
         analyze_column(df, column)
     
     show_missing_data(df)
+
+# CSS להוספת רקע
+st.markdown("""
+    <style>
+    .dashboard-section {
+        background-color: #f0f2f6;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+# יצירת הדשבורד
+st.write("## Mini Dashboard")
+
+# ריבועים של sum, mean, median, std
+with st.container():
+    st.write("### Summary Statistics")
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.metric(label="Sum", value="12345")
+    with col2:
+        st.metric(label="Mean", value="678")
+    with col3:
+        st.metric(label="Median", value="90")
+    with col4:
+        st.metric(label="Std Dev", value="12")
+
+# בר צ'ארט
+with st.container():
+    st.write("### Bar Chart")
+    fig = px.bar(x=["A", "B", "C"], y=[1, 3, 2])
+    st.plotly_chart(fig)
+
+# היסטוגרמה
+with st.container():
+    st.write("### Histogram")
+    fig = px.histogram(x=[1, 2, 2, 3, 3, 3])
+    st.plotly_chart(fig)
+
+# Expander של unique values ו-distinct values
+with st.container():
+    st.write("### Unique and Distinct Values")
+    col1, col2 = st.columns(2)
+    with col1:
+        with st.expander("Unique Values"):
+            st.write("Unique values here")
+    with col2:
+        with st.expander("Distinct Values"):
+            st.write("Distinct values here")
+
