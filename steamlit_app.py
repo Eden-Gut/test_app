@@ -197,7 +197,7 @@ def show_missing_data(df):
         st.dataframe(df)
 
 # הגדרת מצב תצוגה רחב
-#st.set_page_config(layout="wide")
+st.set_page_config(layout="wide")
 
 # Expander להעלאת קובץ
 with st.expander("Upload your CSV file", expanded=True):
