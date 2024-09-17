@@ -104,7 +104,7 @@ def display_statistics_text(df, column):
     distinct_percentage = (distinct_values / total_values) * 100
     
     # חלוקה לשלוש עמודות: גרף עוגה, גרף בר ו-expander
-    col1, col2, col3 = st.columns([1, 1, 1.5])
+    col1, col2, col3 = st.columns([1, 1, 1])
     
     with col1:
         top_values = col_data.value_counts().head(5)
