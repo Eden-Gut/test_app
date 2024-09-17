@@ -3,54 +3,31 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 
-# פונקציה לשינוי פורמט עמודות
-def change_column_format(df, column):
-    st.write("### Change Column Format")
-    
-    # אפשרויות לפורמט עמודה
-    format_options = ["None", "Currency", "Date", "Numeric", "Text"]
-    format_choice = st.selectbox("Choose format:", format_options)
-    
-    if format_choice == "Currency":
-        df[column] = df[column].apply(lambda x: f"${x:,.2f}" if pd.api.types.is_numeric_dtype(df[column]) else x)
-        st.write(f"Column '{column}' formatted as Currency.")
-    
-    elif format_choice == "Date":
-        df[column] = pd.to_datetime(df[column], errors='coerce').dt.strftime('%Y-%m-%d')
-        st.write(f"Column '{column}' formatted as Date.")
-    
-    elif format_choice == "Numeric":
-        df[column] = pd.to_numeric(df[column], errors='coerce')
-        st.write(f"Column '{column}' formatted as Numeric.")
-    
-    elif format_choice == "Text":
-        df[column] = df[column].astype(str)
-        st.write(f"Column '{column}' formatted as Text.")
-    
-    st.dataframe(df, use_container_width=True)
-
 # פונקציה להצגת סטטיסטיקות או הערכים הנפוצים ביותר
 def display_statistics_or_top_values(df, column):
     col_data = df[column]
     
+    # יצירת ריבועים סטטיסטיים עבור עמודות מספריות
     if pd.api.types.is_numeric_dtype(col_data):
         total_sum = col_data.sum()
         mean_val = col_data.mean()
         median_val = col_data.median()
         std_dev = col_data.std()
         
-        col1, col2 = st.columns(2)
-        with col1:
-            st.metric(label="Sum", value=f"{total_sum:,.2f}")
-        with col2:
-            st.metric(label="Mean", value=f"{mean_val:,.2f}")
-        
-        col3, col4 = st.columns(2)
-        with col3:
-            st.metric(label="Median", value=f"{median_val:,.2f}")
-        with col4:
-            st.metric(label="Std Dev", value=f"{std_dev:,.2f}")
+        with st.container():
+            col1, col2 = st.columns(2)
+            with col1:
+                st.metric(label="Sum", value=f"{total_sum:,.2f}")
+            with col2:
+                st.metric(label="Mean", value=f"{mean_val:,.2f}")
+            
+            col3, col4 = st.columns(2)
+            with col3:
+                st.metric(label="Median", value=f"{median_val:,.2f}")
+            with col4:
+                st.metric(label="Std Dev", value=f"{std_dev:,.2f}")
     
+    # יצירת ריבועים עם הערכים הנפוצים ביותר עבור עמודות טקסטואליות
     elif pd.api.types.is_string_dtype(col_data):
         top_values = col_data.value_counts().head(4)
         col1, col2 = st.columns(2)
@@ -69,16 +46,18 @@ def analyze_column(df, column):
     
     total_values = col_data.size
     unique_values = col_data.nunique()
-    missing_values = col_data.isna().sum()
+    distinct_values = col_data.drop_duplicates().nunique()
     
     unique_percentage = (unique_values / total_values) * 100
-    missing_percentage = (missing_values / total_values) * 100
+    distinct_percentage = (distinct_values / total_values) * 100
     
-    labels = ['Unique Values', 'Missing Values']
-    values = [unique_values, missing_values]
-    percentages = [unique_percentage, missing_percentage]
+    # גרף עמודות להצגת ערכים יוניקים ודיסטינקטיים
+    labels = ['Unique Values', 'Distinct Values']
+    values = [unique_values, distinct_values]
+    percentages = [unique_percentage, distinct_percentage]
     
     col1, col2 = st.columns([2, 1])
+    
     with col1:
         fig1 = px.bar(x=labels, y=values, title='Bar Chart of Column Analysis', labels={'x': 'Category', 'y': 'Count'})
         fig1.update_traces(text=[f'{v} ({p:.2f}%)' for v, p in zip(values, percentages)], textposition='outside')
@@ -89,10 +68,12 @@ def analyze_column(df, column):
         with st.expander("Unique Values"):
             st.write(col_data.dropna().unique().tolist())
         
-        with st.expander("Missing Values"):
-            st.write(col_data[col_data.isna()].index.tolist())
+        with st.expander("Distinct Values"):
+            st.write(col_data.drop_duplicates().unique().tolist())
     
-    col3, col4 = st.columns(2)
+    # הצגת היסטוגרמה לצד הריבועים הסטטיסטיים
+    col3, col4 = st.columns([1, 1])
+    
     with col3:
         if pd.api.types.is_numeric_dtype(col_data):
             fig2 = px.histogram(col_data.dropna(), nbins=20, title=f'Histogram of {column}')
@@ -149,55 +130,3 @@ if uploaded_file:
         analyze_column(df, column)
     
     show_missing_data(df)
-
-# CSS להוספת רקע
-st.markdown("""
-    <style>
-    .dashboard-section {
-        background-color: #f0f2f6;
-        padding: 10px;
-        border-radius: 5px;
-        margin-bottom: 10px;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
-# יצירת הדשבורד
-st.write("## Mini Dashboard")
-
-# ריבועים של sum, mean, median, std
-with st.container():
-    st.write("### Summary Statistics")
-    col1, col2, col3, col4 = st.columns(4)
-    with col1:
-        st.metric(label="Sum", value="12345")
-    with col2:
-        st.metric(label="Mean", value="678")
-    with col3:
-        st.metric(label="Median", value="90")
-    with col4:
-        st.metric(label="Std Dev", value="12")
-
-# בר צ'ארט
-with st.container():
-    st.write("### Bar Chart")
-    fig = px.bar(x=["A", "B", "C"], y=[1, 3, 2])
-    st.plotly_chart(fig)
-
-# היסטוגרמה
-with st.container():
-    st.write("### Histogram")
-    fig = px.histogram(x=[1, 2, 2, 3, 3, 3])
-    st.plotly_chart(fig)
-
-# Expander של unique values ו-distinct values
-with st.container():
-    st.write("### Unique and Distinct Values")
-    col1, col2 = st.columns(2)
-    with col1:
-        with st.expander("Unique Values"):
-            st.write("Unique values here")
-    with col2:
-        with st.expander("Distinct Values"):
-            st.write("Distinct values here")
-
