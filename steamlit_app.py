@@ -18,8 +18,18 @@ st.markdown(
         color: black;
         margin-bottom: 10px;
         display: flex;
-        align-items: center; /* כיוונון אנכי */
-        justify-content: center; /* כיוונון אופקי */
+        flex-direction: column;  /* מסדר את התוכן בכיוון עמודה */
+        align-items: center;     /* ממקם במרכז */
+        justify-content: center; /* ממקם במרכז */
+    }
+    div[data-testid="stMetricLabel"] {
+        font-size: 16px;   /* גודל הגופן של הכותרת */
+        font-weight: bold; /* הופך את הכותרת לבולטת */
+        margin-bottom: 5px; /* רווח קטן מתחת לכותרת */
+    }
+    div[data-testid="stMetricValue"] {
+        font-size: 24px;   /* גודל הגופן של הערך */
+        font-weight: bold; /* הערך גם יהיה בולט */
     }
     </style>
     """, unsafe_allow_html=True
