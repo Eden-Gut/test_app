@@ -118,8 +118,16 @@ def display_statistics_text(df, column):
         
         fig_bar = px.bar(x=labels, y=values, title='Bar Chart of Column Analysis', labels={'x': 'Category', 'y': 'Count'})
         fig_bar.update_traces(text=[f'{v} ({p:.2f}%)' for v, p in zip(values, percentages)], textposition='outside')
-        fig_bar.update_layout(hovermode="x unified")
-        st.plotly_chart(fig_bar)
+        fig_bar.update_layout(
+        hovermode="x unified",
+        width=800,  # רוחב הגרף
+        height=600,  # גובה הגרף
+        xaxis_tickangle=-45  # זווית הטקסט על ציר ה-x
+    )
+    fig_bar.update_traces(
+        textfont_size=12  # גודל הגופן של הערכים
+    )
+    st.plotly_chart(fig_bar)
     
     with col3:
         with st.expander("Unique Values"):
