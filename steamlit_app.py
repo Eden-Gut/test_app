@@ -6,7 +6,7 @@ import plotly.express as px
 # הגדרת מצב תצוגה רחב
 st.set_page_config(layout="wide")
 
-# עיצוב סטייל מותאם עבור הסטטיסטיקות
+# עיצוב סטייל מותאם עבור הסטטיסטיקות וה-sidebar
 st.markdown(
     """
     <style>
@@ -31,13 +31,24 @@ st.markdown(
         font-size: 24px;
         font-weight: bold;
     }
+
+    section[data-testid="stSidebar"] {
+        background-color: #333333;
+    }
+
+    /* עיצוב הכותרות ב-sidebar */
+    .sidebar-link {
+        color: #f5f5f5 !important;
+        font-weight: bold;
+        text-decoration: none !important;
+    }
+
+    .sidebar-link:hover {
+        color: #ffffff !important;
+    }
     </style>
     """, unsafe_allow_html=True
 )
-
-# שמירת הפורמטים שנבחרו לכל עמודה
-if "column_formats" not in st.session_state:
-    st.session_state["column_formats"] = {}
 
 # פונקציה ליישום הפורמטים על העמודות
 def apply_column_formats(df):
@@ -54,7 +65,7 @@ def apply_column_formats(df):
 
 # פונקציה לשינוי פורמט עמודות
 def change_column_format(df, column):
-    st.write("### Change Column Format")
+    st.write("### Change Column Format", anchor="change-column-format")
     
     # בדיקה אם יש פורמט שנשמר כבר לעמודה
     current_format = st.session_state["column_formats"].get(column, "None")
@@ -88,139 +99,56 @@ def change_column_format(df, column):
         df[column] = df[column].astype(str)
         st.write(f"Column '{column}' formatted as Text.")
     
-    button_container = st.container()
+    # הוספת כפתורים במבנה ברור יותר עם מרווח להודעה
+    save_col, download_col = st.columns([1, 1])
+    with save_col:
+        if st.button("Save Format"):
+            st.session_state["column_formats"][column] = format_choice
+            st.success(f"Format for column '{column}' saved as {format_choice}.")
+    with download_col:
+        @st.cache_data
+        def convert_df_to_excel(df):
+            return df.to_excel(index=False)
 
-    with button_container:
-        col1, col2 = st.columns([0.1, 1.7])  # הקטנתי את הרוחב כדי שהכפתורים יהיו צמודים
-        with col1:
-            # כפתור לשמירת הפורמט הנבחר
-            if st.button("Save Format"):
-                st.session_state["column_formats"][column] = format_choice
-                st.success(f"Format for column '{column}' saved as {format_choice}.")
-        with col2:
-            # יצירת כפתור להורדת הקובץ
-            @st.cache_data
-            def convert_df_to_excel(df):
-                return df.to_excel(index=False)
-
-            if st.button('Download Excel'):
-                excel_data = convert_df_to_excel(df)
-                st.download_button(
-                    label="Download Excel file",
-                    data=excel_data,
-                    file_name='filtered_data.xlsx',
-                    mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                )
-            
+        if st.button('Download Excel'):
+            excel_data = convert_df_to_excel(df)
+            st.download_button(
+                label="Download Excel file",
+                data=excel_data,
+                file_name='filtered_data.xlsx',
+                mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            )
+    
     # בחירת עמודות לסינון
     selected_columns = st.multiselect(
         "Filter columns",
         options=df.columns,
-        default=df.columns.tolist()
+        default=df.columns.tolist(),
+        key="filter-columns"
     )
 
     filtered_df = df[selected_columns]
     st.dataframe(filtered_df, use_container_width=True)
 
 
-# פונקציה להצגת סטטיסטיקות עבור עמודות מספריות
-def display_statistics_numeric(df, column):
-    col_data = df[column]
-    total_sum = col_data.sum()
-    mean_val = col_data.mean()
-    median_val = col_data.median()
-    std_dev = col_data.std()
-    min_val = col_data.min()
-    max_val = col_data.max()
-    q25 = col_data.quantile(0.25)
-    q75 = col_data.quantile(0.75)
-    
-    # חלוקה לשלוש עמודות: שתיים לסטטיסטיקות, אחת להיסטוגרמה
-    col1, col2, col3 = st.columns([1, 1, 1])
-      
-    with col1:
-        st.metric(label="Sum", value=f"{total_sum:,.2f}")
-        st.metric(label="Median", value=f"{median_val:,.2f}")
-        st.metric(label="Min", value=f"{min_val:,.2f}")
-        st.metric(label="25th Percentile", value=f"{q25:,.2f}")
-      
-    with col2:
-        st.metric(label="Mean", value=f"{mean_val:,.2f}")
-        st.metric(label="Std Dev", value=f"{std_dev:,.2f}")
-        st.metric(label="Max", value=f"{max_val:,.2f}")
-        st.metric(label="75th Percentile", value=f"{q75:,.2f}")
-    
-    with col3:
-        fig = px.histogram(col_data.dropna(), nbins=20, title=f'Histogram of {column}')
-        fig.update_layout(xaxis_title='Value', yaxis_title='Frequency')
-        st.plotly_chart(fig)
+# פונקציה להצגת ערכים חסרים כולל ריקים ""
+def highlight_missing(val):
+    if pd.isnull(val) or val == "":
+        return 'background-color: red'
+    return ''
 
-# פונקציה להצגת סטטיסטיקות עבור עמודות טקסטואליות
-def display_statistics_text(df, column):
-    col_data = df[column]
-    total_values = col_data.size
-    unique_values = col_data.nunique()
-    distinct_values = col_data.drop_duplicates().nunique()
-    
-    unique_percentage = (unique_values / total_values) * 100
-    distinct_percentage = (distinct_values / total_values) * 100
-    
-    # חלוקה לשלוש עמודות: גרף עוגה, גרף בר ו-expander
-    col1, col2, col3 = st.columns([1, 1, 1])
-    
-    with col1:
-        top_values = col_data.value_counts().head(5)
-        fig_pie = px.pie(values=top_values.values, names=top_values.index, title="Top 5 Most Frequent Values")
-        st.plotly_chart(fig_pie)
-    
-    with col2:
-        labels = ['Unique Values', 'Distinct Values']
-        values = [unique_values, distinct_values]
-        percentages = [unique_percentage, distinct_percentage]
-        
-        fig_bar = px.bar(x=labels, y=values, title='Bar Chart of Column Analysis', labels={'x': 'Category', 'y': 'Count'})
-        fig_bar.update_traces(text=[f'{v} ({p:.2f}%)' for v, p in zip(values, percentages)], textposition='outside')
-        fig_bar.update_layout(
-            hovermode="x unified",
-            width=550,  # שמירה על רוחב הגרף
-            height=500  # שמירה על גובה הגרף
-        )
-        fig_bar.update_traces(
-            textfont_size=12  # שמירה על גודל הגופן של הערכים
-        )
-        st.plotly_chart(fig_bar)
-    
-    with col3:
-        with st.expander("Unique Values"):
-            st.write(col_data.dropna().unique().tolist())
-        
-        with st.expander("Distinct Values"):
-            st.write(col_data.drop_duplicates().unique().tolist())
-
-# פונקציה לניתוח עמודה 
-def analyze_column(df, column):
-    col_data = df[column]
-    st.write(f"### Analysis of '{column}'")
-    
-    if pd.api.types.is_numeric_dtype(col_data):
-        # הצגת סטטיסטיקות וגרף היסטוגרמה עבור עמודות מספריות
-        display_statistics_numeric(df, column)
-    
-    elif pd.api.types.is_string_dtype(col_data):
-        # ניתוח עבור עמודות טקסטואליות
-        display_statistics_text(df, column)
-
-# פונקציה להצגת השורות עם ערכים חסרים
 def show_missing_data(df):
-    st.write("### Handling Missing Values")
+    st.write("### Handling Missing Values", anchor="handling-missing-values")
     
-    missing_data = df[df.isnull().any(axis=1)]
+    # התייחסות לערכים חסרים וריקים ""
+    missing_data = df[df.isnull().any(axis=1) | (df == "").any(axis=1)]
+    
     if not missing_data.empty:
         st.write("Rows with Missing Values:")
-        st.dataframe(missing_data, use_container_width=True)
+        st.dataframe(missing_data.style.applymap(highlight_missing), use_container_width=True)
     
-    column = st.selectbox("Select column to fill missing values:", df.columns[df.isnull().any()])
-    
+    column = st.selectbox("Select column to fill missing values:", df.columns[df.isnull().any() | (df == "").any()])
+
     if column:
         fill_option = st.selectbox("How would you like to fill the missing values?", ["Mean", "Median", "Mode", "Custom Value"])
         
@@ -239,8 +167,7 @@ def show_missing_data(df):
         st.dataframe(df, use_container_width=True)
 
 # Expander להעלאת קובץ
-with st.expander("Upload your CSV file", expanded=True):
-    uploaded_file = st.file_uploader("Upload your CSV file", type=["csv"])
+uploaded_file = st.file_uploader("Upload your CSV file", type=["csv"])
 
 if uploaded_file:
     df = pd.read_csv(uploaded_file)
@@ -253,6 +180,15 @@ if uploaded_file:
     column = st.selectbox("Select a column to analyze:", df.columns)
     if column:
         change_column_format(df, column)
-        analyze_column(df, column)
-    
-    show_missing_data(df)
+        show_missing_data(df)
+
+    # Sidebar עם קישורים יופיע רק אחרי העלאת קובץ
+    with st.sidebar:
+        st.markdown("<h2 style='color:white;'>Navigation</h2>", unsafe_allow_html=True)
+        st.markdown("[Change Column Format](#change-column-format)", unsafe_allow_html=True)
+        st.markdown("[Filter Columns](#filter-columns)", unsafe_allow_html=True)
+        st.markdown("[Missing Values](#handling-missing-values)", unsafe_allow_html=True)
+        st.markdown("<hr>", unsafe_allow_html=True)
+
+else:
+    st.sidebar.write("Upload a CSV file to enable navigation.")
