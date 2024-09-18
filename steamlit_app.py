@@ -215,7 +215,7 @@ def analyze_column(df, column):
 
 # פונקציה להצגת ערכים חסרים כולל ריקים ""
 def highlight_missing(val):
-    if pd.isnull(val) or val == "":
+    if pd.isnull(val) or val == " ":
         return 'background-color: red'
     return ''
 
