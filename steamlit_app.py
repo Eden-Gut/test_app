@@ -87,7 +87,9 @@ def change_column_format(df, column):
     elif format_choice == "Text":
         df[column] = df[column].astype(str)
         st.write(f"Column '{column}' formatted as Text.")
-
+    # בחירת עמודה והגדרת פורמט
+    column = st.selectbox("Select column to format", df.columns)
+    format_choice = st.text_input("Enter format for the column")
     button_container = st.container()
 
     with button_container:
