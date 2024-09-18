@@ -217,7 +217,7 @@ def show_missing_data(df):
     missing_data = df[df.isnull().any(axis=1)]
     if not missing_data.empty:
         st.write("Rows with Missing Values:")
-        st.dataframe(missing_data)
+        st.dataframe(missing_data, use_container_width=True)
     
     column = st.selectbox("Select column to fill missing values:", df.columns[df.isnull().any()])
     
@@ -236,7 +236,7 @@ def show_missing_data(df):
                 df[column].fillna(custom_value, inplace=True)
         
         st.write("### Data after handling missing values")
-        st.dataframe(df)
+        st.dataframe(df, use_container_width=True)
 
 # Expander להעלאת קובץ
 with st.expander("Upload your CSV file", expanded=True):
