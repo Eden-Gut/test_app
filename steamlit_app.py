@@ -93,7 +93,7 @@ def change_column_format(df, column):
         st.session_state["column_formats"][column] = format_choice
         st.success(f"Format for column '{column}' saved as {format_choice}.")
         
-    columns = st.multiselect("Columns:",df.columns)
+    multi_select =  st.multiselect("filter column", options = df.columns)
     st.dataframe(df, use_container_width=True)
 
 # פונקציה להצגת סטטיסטיקות עבור עמודות מספריות
