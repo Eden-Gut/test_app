@@ -91,7 +91,7 @@ def change_column_format(df, column):
     button_container = st.container()
 
     with button_container:
-        col1, col2 = st.columns([0.1, 0.1])  # הקטנתי את הרוחב כדי שהכפתורים יהיו צמודים
+        col1, col2 = st.columns([0.1, 0.4])  # הקטנתי את הרוחב כדי שהכפתורים יהיו צמודים
         with col1:
             # כפתור לשמירת הפורמט הנבחר
             if st.button("Save Format"):
