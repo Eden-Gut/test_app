@@ -53,7 +53,6 @@ def change_column_format(df, column):
     if format_choice == "Currency":
         if pd.api.types.is_numeric_dtype(df[column]):
             df[column] = df[column].apply(lambda x: f"${x:,.2f}")
-            st.session_state["column_formats"][column] = "Currency"
             st.write(f"Column '{column}' formatted as Currency.")
         else:
             st.warning(f"Cannot convert column '{column}' to Currency. It is not numeric.")
@@ -61,7 +60,6 @@ def change_column_format(df, column):
     elif format_choice == "Date":
         try:
             df[column] = pd.to_datetime(df[column], errors='coerce').dt.strftime('%Y-%m-%d')
-            st.session_state["column_formats"][column] = "Date"
             st.write(f"Column '{column}' formatted as Date.")
         except Exception as e:
             st.warning(f"Cannot convert column '{column}' to Date. Error: {e}")
@@ -69,16 +67,19 @@ def change_column_format(df, column):
     elif format_choice == "Numeric":
         if pd.api.types.is_numeric_dtype(df[column]):
             df[column] = pd.to_numeric(df[column], errors='coerce')
-            st.session_state["column_formats"][column] = "Numeric"
             st.write(f"Column '{column}' formatted as Numeric.")
         else:
             st.warning(f"Cannot convert column '{column}' to Numeric. It is not numeric.")
     
     elif format_choice == "Text":
         df[column] = df[column].astype(str)
-        st.session_state["column_formats"][column] = "Text"
         st.write(f"Column '{column}' formatted as Text.")
     
+    # כפתור לשמירת הפורמט הנבחר
+    if st.button("Save Format"):
+        st.session_state["column_formats"][column] = format_choice
+        st.success(f"Format for column '{column}' saved as {format_choice}.")
+
     st.dataframe(df, use_container_width=True)
 
 # פונקציה להצגת סטטיסטיקות עבור עמודות מספריות
@@ -195,7 +196,6 @@ def show_missing_data(df):
         
         st.write("### Data after handling missing values")
         st.dataframe(df)
-
 
 # Expander להעלאת קובץ
 with st.expander("Upload your CSV file", expanded=True):
