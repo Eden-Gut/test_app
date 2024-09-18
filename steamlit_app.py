@@ -39,6 +39,19 @@ st.markdown(
 if "column_formats" not in st.session_state:
     st.session_state["column_formats"] = {}
 
+# פונקציה ליישום הפורמטים על העמודות
+def apply_column_formats(df):
+    for column, format_type in st.session_state["column_formats"].items():
+        if format_type == "Currency" and pd.api.types.is_numeric_dtype(df[column]):
+            df[column] = df[column].apply(lambda x: f"${x:,.2f}")
+        elif format_type == "Date":
+            df[column] = pd.to_datetime(df[column], errors='coerce').dt.strftime('%Y-%m-%d')
+        elif format_type == "Numeric":
+            df[column] = pd.to_numeric(df[column], errors='coerce')
+        elif format_type == "Text":
+            df[column] = df[column].astype(str)
+    return df
+
 # פונקציה לשינוי פורמט עמודות
 def change_column_format(df, column):
     st.write("### Change Column Format")
@@ -206,11 +219,19 @@ if uploaded_file:
     
     with st.expander("Data Preview", expanded=True):
         st.write("### Data Preview")
+        df = apply_column_formats(df)  # יישום פורמטים שנשמרו
         st.dataframe(df, use_container_width=True)
 
     column = st.selectbox("Select a column to analyze:", df.columns)
     if column:
         change_column_format(df, column)
         analyze_column(df, column)
-        
+    
     show_missing_data(df)
+
+    # ייצוא הנתונים כקובץ CSV
+    st.write("### Export Data")
+    if st.button("Export as CSV"):
+        df_export = apply_column_formats(df.copy())
+        csv = df_export.to_csv(index=False)
+        st.download_button(label="Download CSV", data=csv, file_name="formatted_data.csv", mime="text/csv")
