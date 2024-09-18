@@ -223,7 +223,7 @@ def show_missing_data(df):
     st.write("### Handling Missing Values", anchor="handling-missing-values")
     
     # התייחסות לערכים חסרים וריקים ""
-    missing_data = df[df.isnull().any(axis=1) | (df == "").any(axis=1)]
+    missing_data = df[df.isnull().any(axis=1) | (df == " ").any(axis=1)]
     
     if not missing_data.empty:
         st.write("Rows with Missing Values:")
