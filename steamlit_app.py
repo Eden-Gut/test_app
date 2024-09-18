@@ -88,15 +88,35 @@ def change_column_format(df, column):
         df[column] = df[column].astype(str)
         st.write(f"Column '{column}' formatted as Text.")
     
- if st.button("Save Format"):
+    # כפתור לשמירת הפורמט הנבחר
+    if st.button("Save Format"):
         st.session_state["column_formats"][column] = format_choice
         st.success(f"Format for column '{column}' saved as {format_choice}.")
-        
+
+    # בחירת עמודות לסינון
     selected_columns = st.multiselect(
-    "Filter columns",
-    options=df.columns,
-    default=df.columns.tolist()
-)
+        "Filter columns",
+        options=df.columns,
+        default=df.columns.tolist()
+    )
+
+    # הצגת הנתונים המסוננים
+    filtered_df = df[selected_columns]
+    st.dataframe(filtered_df, use_container_width=True)
+
+    # יצירת כפתור להורדת הקובץ
+    @st.cache_data
+    def convert_df_to_excel(df):
+        return df.to_excel(index=False)
+
+    if st.button('Download Excel'):
+        excel_data = convert_df_to_excel(filtered_df)
+        st.download_button(
+            label="Download Excel file",
+            data=excel_data,
+            file_name='filtered_data.xlsx',
+            mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
     filtered_df = df[selected_columns]
     st.dataframe(filtered_df,use_container_width=True)
 
