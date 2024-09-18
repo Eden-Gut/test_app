@@ -257,9 +257,4 @@ if uploaded_file:
     
     show_missing_data(df)
 
-    # ייצוא הנתונים כקובץ Excel
-    st.write("### Export Data")
-    if st.button("Export as CSV"):
-        df_export = apply_column_formats(df.copy())
-        csv = df_export.to_csv(index=False)
-        st.download_button(label="Download CSV", data=csv, file_name="formatted_data.csv", mime="text/csv")
+  
