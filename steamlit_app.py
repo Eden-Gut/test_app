@@ -229,7 +229,7 @@ def show_missing_data(df):
         st.write("Rows with Missing Values:")
         st.dataframe(missing_data.style.applymap(highlight_missing), use_container_width=True)
     
-    column = st.selectbox("Select column to fill missing values:", df.columns[df.isnull().any() | (df == "").any()])
+    column = st.selectbox("Select column to fill missing values:", df.columns[df.isnull().any() | (df == " ").any()])
 
     if column:
         fill_option = st.selectbox("How would you like to fill the missing values?", ["Mean", "Median", "Mode", "Custom Value"])
