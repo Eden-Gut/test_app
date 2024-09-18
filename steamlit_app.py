@@ -35,6 +35,26 @@ st.markdown(
     """, unsafe_allow_html=True
 )
 
+# Sidebar עם קישורים לכל כותרות העמוד
+with st.sidebar:
+    st.markdown("<h2 style='color:white;'>Navigation</h2>", unsafe_allow_html=True)
+    st.markdown("[Change Column Format](#change-column-format)", unsafe_allow_html=True)
+    st.markdown("[Filter Columns](#filter-columns)", unsafe_allow_html=True)
+    st.markdown("[Missing Values](#handling-missing-values)", unsafe_allow_html=True)
+    st.markdown("<hr>", unsafe_allow_html=True)
+    st.markdown("<h4 style='color:white;'>Customization</h4>", unsafe_allow_html=True)
+
+# צביעת ה-sidebar באפור כהה
+st.markdown(
+    """
+    <style>
+    section[data-testid="stSidebar"] {
+        background-color: #333333;
+    }
+    </style>
+    """, unsafe_allow_html=True
+)
+
 # שמירת הפורמטים שנבחרו לכל עמודה
 if "column_formats" not in st.session_state:
     st.session_state["column_formats"] = {}
@@ -54,7 +74,7 @@ def apply_column_formats(df):
 
 # פונקציה לשינוי פורמט עמודות
 def change_column_format(df, column):
-    st.write("### Change Column Format")
+    st.write("### Change Column Format", anchor="change-column-format")
     
     # בדיקה אם יש פורמט שנשמר כבר לעמודה
     current_format = st.session_state["column_formats"].get(column, "None")
@@ -116,7 +136,8 @@ def change_column_format(df, column):
     selected_columns = st.multiselect(
         "Filter columns",
         options=df.columns,
-        default=df.columns.tolist()
+        default=df.columns.tolist(),
+        key="filter-columns"
     )
 
     filtered_df = df[selected_columns]
@@ -180,14 +201,6 @@ def display_statistics_text(df, column):
         
         fig_bar = px.bar(x=labels, y=values, title='Bar Chart of Column Analysis', labels={'x': 'Category', 'y': 'Count'})
         fig_bar.update_traces(text=[f'{v} ({p:.2f}%)' for v, p in zip(values, percentages)], textposition='outside')
-        fig_bar.update_layout(
-            hovermode="x unified",
-            width=550,  # שמירה על רוחב הגרף
-            height=500  # שמירה על גובה הגרף
-        )
-        fig_bar.update_traces(
-            textfont_size=12  # שמירה על גודל הגופן של הערכים
-        )
         st.plotly_chart(fig_bar)
     
     with col3:
@@ -197,27 +210,17 @@ def display_statistics_text(df, column):
         with st.expander("Distinct Values"):
             st.write(col_data.drop_duplicates().unique().tolist())
 
-# פונקציה לניתוח עמודה 
-def analyze_column(df, column):
-    col_data = df[column]
-    st.write(f"### Analysis of '{column}'")
-    
-    if pd.api.types.is_numeric_dtype(col_data):
-        # הצגת סטטיסטיקות וגרף היסטוגרמה עבור עמודות מספריות
-        display_statistics_numeric(df, column)
-    
-    elif pd.api.types.is_string_dtype(col_data):
-        # ניתוח עבור עמודות טקסטואליות
-        display_statistics_text(df, column)
-
 # פונקציה להצגת השורות עם ערכים חסרים
+def highlight_missing(val):
+    return 'background-color: red' if pd.isnull(val) else ''
+
 def show_missing_data(df):
-    st.write("### Handling Missing Values")
+    st.write("### Handling Missing Values", anchor="handling-missing-values")
     
     missing_data = df[df.isnull().any(axis=1)]
     if not missing_data.empty:
         st.write("Rows with Missing Values:")
-        st.dataframe(missing_data, use_container_width=True)
+        st.dataframe(missing_data.style.applymap(highlight_missing), use_container_width=True)
     
     column = st.selectbox("Select column to fill missing values:", df.columns[df.isnull().any()])
     
@@ -256,5 +259,3 @@ if uploaded_file:
         analyze_column(df, column)
     
     show_missing_data(df)
-
-  
