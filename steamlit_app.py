@@ -217,12 +217,19 @@ def show_missing_data(df):
         st.write("### Data after handling missing values")
         st.dataframe(df)
 
-# פונקציה למחיקת עמודות מהנתונים
+# פונקציה למחיקת עמודות באמצעות כפתור "X"
 def delete_columns(df):
-    columns_to_delete = st.multiselect("Select columns to delete:", df.columns)
-    if st.button("Delete Columns"):
-        df.drop(columns=columns_to_delete, inplace=True)
-        st.success(f"Deleted columns: {', '.join(columns_to_delete)}")
+    st.write("### Delete Columns")
+    columns = df.columns.tolist()
+    
+    for column in columns:
+        col1, col2 = st.columns([9, 1])
+        with col1:
+            st.write(column)
+        with col2:
+            if st.button("X", key=column):
+                df.drop(columns=[column], inplace=True)
+                st.experimental_rerun()
 
 # Expander להעלאת קובץ
 with st.expander("Upload your CSV file", expanded=True):
@@ -242,5 +249,5 @@ if uploaded_file:
     
     show_missing_data(df)
 
-    # מחיקת עמודות לא רצויות
+    # מחיקת עמודות עם כפתור "X"
     delete_columns(df)
