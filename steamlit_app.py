@@ -50,6 +50,10 @@ st.markdown(
     """, unsafe_allow_html=True
 )
 
+# ודא שמפתח 'column_formats' קיים ב-session_state
+if "column_formats" not in st.session_state:
+    st.session_state["column_formats"] = {}
+
 # פונקציה ליישום הפורמטים על העמודות
 def apply_column_formats(df):
     for column, format_type in st.session_state["column_formats"].items():
