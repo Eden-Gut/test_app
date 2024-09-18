@@ -53,7 +53,7 @@ st.markdown(
 # Sidebar עם קישורים לכל כותרות העמוד
 with st.sidebar:
     st.markdown("<h2 style='color:white;'>Navigation</h2>", unsafe_allow_html=True)
-    st.markdown("[Change Column Format](#change-column-format)", unsafe_allow_html=True, unsafe_allow_html=True)
+    st.markdown("[Change Column Format](#change-column-format)", unsafe_allow_html=True)
     st.markdown("[Filter Columns](#filter-columns)", unsafe_allow_html=True)
     st.markdown("[Missing Values](#handling-missing-values)", unsafe_allow_html=True)
     st.markdown("<hr>", unsafe_allow_html=True)
