@@ -31,6 +31,27 @@ st.markdown(
         font-size: 24px;
         font-weight: bold;
     }
+    .delete-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    .delete-item {
+        padding: 5px 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        display: inline-flex;
+        align-items: center;
+        background-color: #f0f0f0;
+    }
+    .delete-item button {
+        background-color: transparent;
+        border: none;
+        margin-left: 5px;
+        cursor: pointer;
+        color: red;
+    }
     </style>
     """, unsafe_allow_html=True
 )
@@ -189,47 +210,29 @@ def analyze_column(df, column):
     elif pd.api.types.is_string_dtype(col_data):
         display_statistics_text(df, column)
 
-# פונקציה להצגת השורות עם ערכים חסרים
-def show_missing_data(df):
-    st.write("### Handling Missing Values")
-    
-    missing_data = df[df.isnull().any(axis=1)]
-    if not missing_data.empty:
-        st.write("Rows with Missing Values:")
-        st.dataframe(missing_data)
-    
-    column = st.selectbox("Select column to fill missing values:", df.columns[df.isnull().any()])
-    
-    if column:
-        fill_option = st.selectbox("How would you like to fill the missing values?", ["Mean", "Median", "Mode", "Custom Value"])
-        
-        if fill_option == "Mean":
-            df[column].fillna(df[column].mean(), inplace=True)
-        elif fill_option == "Median":
-            df[column].fillna(df[column].median(), inplace=True)
-        elif fill_option == "Mode":
-            df[column].fillna(df[column].mode()[0], inplace=True)
-        elif fill_option == "Custom Value":
-            custom_value = st.text_input("Enter custom value:")
-            if custom_value:
-                df[column].fillna(custom_value, inplace=True)
-        
-        st.write("### Data after handling missing values")
-        st.dataframe(df)
-
-# פונקציה למחיקת עמודות באמצעות כפתור "X"
+# פונקציה למחיקת עמודות באמצעות בר אופקי עם כפתור "X"
 def delete_columns(df):
     st.write("### Delete Columns")
     columns = df.columns.tolist()
     
+    # שימוש בעיצוב מותאם למחיקה
+    st.markdown('<div class="delete-bar">', unsafe_allow_html=True)
+    
     for column in columns:
-        col1, col2 = st.columns([9, 1])
-        with col1:
-            st.write(column)
-        with col2:
-            if st.button("X", key=column):
-                df.drop(columns=[column], inplace=True)
-                st.experimental_rerun()
+        st.markdown(f'''
+        <div class="delete-item">
+            {column}
+            <button onclick="window.location.href += '&delete={column}'">X</button>
+        </div>
+        ''', unsafe_allow_html=True)
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    # בדיקה אם המשתמש לחץ על כפתור מחיקה
+    delete_col = st.experimental_get_query_params().get("delete", None)
+    if delete_col:
+        df.drop(columns=delete_col, inplace=True)
+        st.experimental_rerun()
 
 # Expander להעלאת קובץ
 with st.expander("Upload your CSV file", expanded=True):
@@ -242,12 +245,10 @@ if uploaded_file:
         df = apply_column_formats(df)  # יישום פורמטים שנשמרו
         st.dataframe(df, use_container_width=True)
 
+    # מחיקת עמודות עם בר אופקי וכפתורי "X"
+    delete_columns(df)
+
     column = st.selectbox("Select a column to analyze:", df.columns)
     if column:
         change_column_format(df, column)
         analyze_column(df, column)
-    
-    show_missing_data(df)
-
-    # מחיקת עמודות עם כפתור "X"
-    delete_columns(df)
