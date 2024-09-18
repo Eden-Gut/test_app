@@ -6,7 +6,7 @@ import plotly.express as px
 # הגדרת מצב תצוגה רחב
 st.set_page_config(layout="wide")
 
-# סגנון מותאם אישית עבור ה-Metric
+# עיצוב סטייל מותאם עבור הסטטיסטיקות
 st.markdown(
     """
     <style>
@@ -18,64 +18,66 @@ st.markdown(
         color: black;
         margin-bottom: 10px;
         display: flex;
-        align-items: center; 
-        justify-content: center; 
-        flex-direction: column;  
-        align-items: center;     
-        justify-content: center; 
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
     }
     div[data-testid="stMetricLabel"] {
-        font-size: 16px;   
-        font-weight: bold; 
-        margin-bottom: 5px; 
+        font-size: 16px;
+        font-weight: bold;
+        margin-bottom: 5px;
     }
     div[data-testid="stMetricValue"] {
-        font-size: 24px;   
-        font-weight: bold; 
+        font-size: 24px;
+        font-weight: bold;
     }
     </style>
     """, unsafe_allow_html=True
 )
 
-# שמירת הפורמטים שנבחרו
-column_formats = {}
+# שמירת הפורמטים שנבחרו לכל עמודה
+if "column_formats" not in st.session_state:
+    st.session_state["column_formats"] = {}
 
 # פונקציה לשינוי פורמט עמודות
 def change_column_format(df, column):
     st.write("### Change Column Format")
     
-    # אם לעמודה יש פורמט ששמור בזיכרון, משתמשים בו
-    current_format = column_formats.get(column, "None")
+    # בדיקה אם יש פורמט שנשמר כבר לעמודה
+    current_format = st.session_state["column_formats"].get(column, "None")
     
     # אפשרויות לפורמט עמודה
     format_options = ["None", "Currency", "Date", "Numeric", "Text"]
     format_choice = st.selectbox("Choose format:", format_options, index=format_options.index(current_format))
     
-    # בדיקה אם העמודה ניתנת לשינוי לפורמט המבוקש
-    if format_choice == "Currency" and pd.api.types.is_numeric_dtype(df[column]):
-        df[column] = df[column].apply(lambda x: f"${x:,.2f}")
-        column_formats[column] = "Currency"
-        st.write(f"Column '{column}' formatted as Currency.")
+    if format_choice == "Currency":
+        if pd.api.types.is_numeric_dtype(df[column]):
+            df[column] = df[column].apply(lambda x: f"${x:,.2f}")
+            st.session_state["column_formats"][column] = "Currency"
+            st.write(f"Column '{column}' formatted as Currency.")
+        else:
+            st.warning(f"Cannot convert column '{column}' to Currency. It is not numeric.")
     
     elif format_choice == "Date":
-        df[column] = pd.to_datetime(df[column], errors='coerce').dt.strftime('%Y-%m-%d')
-        column_formats[column] = "Date"
-        st.write(f"Column '{column}' formatted as Date.")
+        try:
+            df[column] = pd.to_datetime(df[column], errors='coerce').dt.strftime('%Y-%m-%d')
+            st.session_state["column_formats"][column] = "Date"
+            st.write(f"Column '{column}' formatted as Date.")
+        except Exception as e:
+            st.warning(f"Cannot convert column '{column}' to Date. Error: {e}")
     
-    elif format_choice == "Numeric" and pd.api.types.is_numeric_dtype(df[column]):
-        df[column] = pd.to_numeric(df[column], errors='coerce')
-        column_formats[column] = "Numeric"
-        st.write(f"Column '{column}' formatted as Numeric.")
+    elif format_choice == "Numeric":
+        if pd.api.types.is_numeric_dtype(df[column]):
+            df[column] = pd.to_numeric(df[column], errors='coerce')
+            st.session_state["column_formats"][column] = "Numeric"
+            st.write(f"Column '{column}' formatted as Numeric.")
+        else:
+            st.warning(f"Cannot convert column '{column}' to Numeric. It is not numeric.")
     
     elif format_choice == "Text":
         df[column] = df[column].astype(str)
-        column_formats[column] = "Text"
+        st.session_state["column_formats"][column] = "Text"
         st.write(f"Column '{column}' formatted as Text.")
-    
-    # אם הפורמט לא אפשרי לעמודה הנבחרת, יצוץ פופ-אפ למשתמש
-    else:
-        if format_choice != "None":
-            st.warning(f"Cannot convert column '{column}' to {format_choice} format.")
     
     st.dataframe(df, use_container_width=True)
 
@@ -136,7 +138,14 @@ def display_statistics_text(df, column):
         
         fig_bar = px.bar(x=labels, y=values, title='Bar Chart of Column Analysis', labels={'x': 'Category', 'y': 'Count'})
         fig_bar.update_traces(text=[f'{v} ({p:.2f}%)' for v, p in zip(values, percentages)], textposition='outside')
-        fig_bar.update_layout(hovermode="x unified")
+        fig_bar.update_layout(
+            hovermode="x unified",
+            width=550,  # שמירה על רוחב הגרף
+            height=500  # שמירה על גובה הגרף
+        )
+        fig_bar.update_traces(
+            textfont_size=12  # שמירה על גודל הגופן של הערכים
+        )
         st.plotly_chart(fig_bar)
     
     with col3:
@@ -187,6 +196,7 @@ def show_missing_data(df):
         st.write("### Data after handling missing values")
         st.dataframe(df)
 
+
 # Expander להעלאת קובץ
 with st.expander("Upload your CSV file", expanded=True):
     uploaded_file = st.file_uploader("Upload your CSV file", type=["csv"])
@@ -203,4 +213,4 @@ if uploaded_file:
         change_column_format(df, column)
         analyze_column(df, column)
         
-    show_missing_data
+    show_missing_data(df)
