@@ -88,10 +88,19 @@ def change_column_format(df, column):
         df[column] = df[column].astype(str)
         st.write(f"Column '{column}' formatted as Text.")
     
-    # כפתור לשמירת הפורמט הנבחר
-    if st.button("Save Format"):
-        st.session_state["column_formats"][column] = format_choice
-        st.success(f"Format for column '{column}' saved as {format_choice}.")
+    # כפתור לשמירת הפורמט הנבחר ולייצוא
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        if st.button("Save Format"):
+            st.session_state["column_formats"][column] = format_choice
+            st.success(f"Format for column '{column}' saved as {format_choice}.")
+    
+    with col2:
+        if st.button("Export as CSV"):
+            df_export = apply_column_formats(df.copy())
+            csv = df_export.to_csv(index=False)
+            st.download_button(label="Download CSV", data=csv, file_name="formatted_data.csv", mime="text/csv")
 
     st.dataframe(df, use_container_width=True)
 
@@ -174,12 +183,10 @@ def analyze_column(df, column):
     col_data = df[column]
     st.write(f"### Analysis of '{column}'")
     
-    if pd.api.types.is_numeric_dtype(col_data):
-        # הצגת סטטיסטיקות וגרף היסטוגרמה עבור עמודות מספריות
+    # נחשב עמודה כעמודה מספרית אם היא בפורמט של מטבע
+    if pd.api.types.is_numeric_dtype(col_data) or st.session_state["column_formats"].get(column) == "Currency":
         display_statistics_numeric(df, column)
-    
     elif pd.api.types.is_string_dtype(col_data):
-        # ניתוח עבור עמודות טקסטואליות
         display_statistics_text(df, column)
 
 # פונקציה להצגת השורות עם ערכים חסרים
@@ -210,6 +217,13 @@ def show_missing_data(df):
         st.write("### Data after handling missing values")
         st.dataframe(df)
 
+# פונקציה למחיקת עמודות מהנתונים
+def delete_columns(df):
+    columns_to_delete = st.multiselect("Select columns to delete:", df.columns)
+    if st.button("Delete Columns"):
+        df.drop(columns=columns_to_delete, inplace=True)
+        st.success(f"Deleted columns: {', '.join(columns_to_delete)}")
+
 # Expander להעלאת קובץ
 with st.expander("Upload your CSV file", expanded=True):
     uploaded_file = st.file_uploader("Upload your CSV file", type=["csv"])
@@ -218,7 +232,6 @@ if uploaded_file:
     df = pd.read_csv(uploaded_file)
     
     with st.expander("Data Preview", expanded=True):
-        st.write("### Data Preview")
         df = apply_column_formats(df)  # יישום פורמטים שנשמרו
         st.dataframe(df, use_container_width=True)
 
@@ -229,9 +242,5 @@ if uploaded_file:
     
     show_missing_data(df)
 
-    # ייצוא הנתונים כקובץ CSV
-    st.write("### Export Data")
-    if st.button("Export as CSV"):
-        df_export = apply_column_formats(df.copy())
-        csv = df_export.to_csv(index=False)
-        st.download_button(label="Download CSV", data=csv, file_name="formatted_data.csv", mime="text/csv")
+    # מחיקת עמודות לא רצויות
+    delete_columns(df)
