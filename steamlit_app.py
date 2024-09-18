@@ -6,7 +6,7 @@ import plotly.express as px
 # הגדרת מצב תצוגה רחב
 st.set_page_config(layout="wide")
 
-# עיצוב סטייל מותאם עבור הסטטיסטיקות
+# עיצוב סטייל מותאם עבור הסטטיסטיקות וה-sidebar
 st.markdown(
     """
     <style>
@@ -31,6 +31,21 @@ st.markdown(
         font-size: 24px;
         font-weight: bold;
     }
+
+    section[data-testid="stSidebar"] {
+        background-color: #333333;
+    }
+
+    /* עיצוב הכותרות ב-sidebar */
+    .sidebar-link {
+        color: #f5f5f5 !important;
+        font-weight: bold;
+        text-decoration: none !important; /* מסיר את הקו התחתון */
+    }
+
+    .sidebar-link:hover {
+        color: #ffffff !important;
+    }
     </style>
     """, unsafe_allow_html=True
 )
@@ -38,22 +53,10 @@ st.markdown(
 # Sidebar עם קישורים לכל כותרות העמוד
 with st.sidebar:
     st.markdown("<h2 style='color:white;'>Navigation</h2>", unsafe_allow_html=True)
-    st.markdown("[Change Column Format](#change-column-format)", unsafe_allow_html=True)
+    st.markdown("[Change Column Format](#change-column-format)", unsafe_allow_html=True, unsafe_allow_html=True)
     st.markdown("[Filter Columns](#filter-columns)", unsafe_allow_html=True)
     st.markdown("[Missing Values](#handling-missing-values)", unsafe_allow_html=True)
     st.markdown("<hr>", unsafe_allow_html=True)
-    st.markdown("<h4 style='color:white;'>Customization</h4>", unsafe_allow_html=True)
-
-# צביעת ה-sidebar באפור כהה
-st.markdown(
-    """
-    <style>
-    section[data-testid="stSidebar"] {
-        background-color: #333333;
-    }
-    </style>
-    """, unsafe_allow_html=True
-)
 
 # שמירת הפורמטים שנבחרו לכל עמודה
 if "column_formats" not in st.session_state:
@@ -209,6 +212,19 @@ def display_statistics_text(df, column):
         
         with st.expander("Distinct Values"):
             st.write(col_data.drop_duplicates().unique().tolist())
+
+# פונקציה לניתוח עמודה 
+def analyze_column(df, column):
+    col_data = df[column]
+    st.write(f"### Analysis of '{column}'")
+    
+    if pd.api.types.is_numeric_dtype(col_data):
+        # הצגת סטטיסטיקות וגרף היסטוגרמה עבור עמודות מספריות
+        display_statistics_numeric(df, column)
+    
+    elif pd.api.types.is_string_dtype(col_data):
+        # ניתוח עבור עמודות טקסטואליות
+        display_statistics_text(df, column)
 
 # פונקציה להצגת השורות עם ערכים חסרים
 def highlight_missing(val):
