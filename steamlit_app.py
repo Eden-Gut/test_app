@@ -87,11 +87,31 @@ def change_column_format(df, column):
     elif format_choice == "Text":
         df[column] = df[column].astype(str)
         st.write(f"Column '{column}' formatted as Text.")
-    
-    # כפתור לשמירת הפורמט הנבחר
-    if st.button("Save Format"):
-        st.session_state["column_formats"][column] = format_choice
-        st.success(f"Format for column '{column}' saved as {format_choice}.")
+
+    button_container = st.container()
+
+    with button_container:
+        col1. col2 = columns([1,1])
+        with col1:
+            # כפתור לשמירת הפורמט הנבחר
+            if st.button("Save Format"):
+                st.session_state["column_formats"][column] = format_choice
+                st.success(f"Format for column '{column}' saved as {format_choice}.")
+        with col1:
+              # יצירת כפתור להורדת הקובץ
+            @st.cache_data
+            def convert_df_to_excel(df):
+                return df.to_excel(index=False)
+
+            if st.button('Download Excel'):
+                excel_data = convert_df_to_excel(filtered_df)
+                st.download_button(
+                    label="Download Excel file",
+                    data=excel_data,
+                    file_name='filtered_data.xlsx',
+                    mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                )
+            
 
     # בחירת עמודות לסינון
     selected_columns = st.multiselect(
@@ -100,19 +120,7 @@ def change_column_format(df, column):
         default=df.columns.tolist()
     )
 
-    # יצירת כפתור להורדת הקובץ
-    @st.cache_data
-    def convert_df_to_excel(df):
-        return df.to_excel(index=False)
-
-    if st.button('Download Excel'):
-        excel_data = convert_df_to_excel(filtered_df)
-        st.download_button(
-            label="Download Excel file",
-            data=excel_data,
-            file_name='filtered_data.xlsx',
-            mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        )
+  
     filtered_df = df[selected_columns]
     st.dataframe(filtered_df,use_container_width=True)
 
