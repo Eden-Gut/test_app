@@ -100,10 +100,6 @@ def change_column_format(df, column):
         default=df.columns.tolist()
     )
 
-    # הצגת הנתונים המסוננים
-    filtered_df = df[selected_columns]
-    st.dataframe(filtered_df, use_container_width=True)
-
     # יצירת כפתור להורדת הקובץ
     @st.cache_data
     def convert_df_to_excel(df):
