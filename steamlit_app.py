@@ -274,7 +274,7 @@ if uploaded_file:
         st.markdown("<h2 style='color:white;'>Navigation</h2>", unsafe_allow_html=True)
         st.markdown("[Change Column Format](#change-column-format)", unsafe_allow_html=True)
         st.markdown("[Analyze Column](#analyze-column)", unsafe_allow_html=True)
-        st.markdown("[Handling Missing Values](#handling-missing-values)", unsafe_allow_html=True)
+        st.markdown("[Handling Missing Vues](#handling-missing-values)", unsafe_allow_html=True)
         st.markdown("<hr>", unsafe_allow_html=True)
 
 else:
