@@ -194,8 +194,8 @@ def display_statistics_text(df, column):
 
 # פונקציה לניתוח עמודה 
 def analyze_column(df, column):
+    st.markdown(f"<h3 id='analyze-column'>Analysis of '{column}'</h3>", unsafe_allow_html=True)
     col_data = df[column]
-    st.write(f"### Analysis of '{column}'", anchor="analyze-column")
     
     if pd.api.types.is_numeric_dtype(col_data):
         display_statistics_numeric(df, column)
@@ -210,7 +210,7 @@ def highlight_missing(val):
     return ''
 
 def show_missing_data(df):
-    st.write("### Handling Missing Values", anchor="handling-missing-values")
+    st.markdown("<h3 id='handling-missing-values'>Handling Missing Values</h3>", unsafe_allow_html=True)
     
     missing_data = df[df.isnull().any(axis=1) | (df == " ").any(axis=1)]
     
