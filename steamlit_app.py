@@ -68,7 +68,7 @@ def apply_column_formats(df):
 
 # פונקציה לשינוי פורמט עמודות
 def change_column_format(df, column):
-    st.markdown("### Change Column Format", unsafe_allow_html=True)
+    st.markdown("<h3 id='change-column-format'>Change Column Format</h3>", unsafe_allow_html=True)
     
     current_format = st.session_state["column_formats"].get(column, "None")
     format_options = ["None", "Currency", "Date", "Numeric", "Text"]
@@ -80,21 +80,18 @@ def change_column_format(df, column):
             st.write(f"Column '{column}' formatted as Currency.")
         else:
             st.warning(f"Cannot convert column '{column}' to Currency. It is not numeric.")
-    
     elif format_choice == "Date":
         try:
             df[column] = pd.to_datetime(df[column], errors='coerce').dt.strftime('%Y-%m-%d')
             st.write(f"Column '{column}' formatted as Date.")
         except Exception as e:
             st.warning(f"Cannot convert column '{column}' to Date. Error: {e}")
-    
     elif format_choice == "Numeric":
         if pd.api.types.is_numeric_dtype(df[column]):
             df[column] = pd.to_numeric(df[column], errors='coerce')
             st.write(f"Column '{column}' formatted as Numeric.")
         else:
             st.warning(f"Cannot convert column '{column}' to Numeric. It is not numeric.")
-    
     elif format_choice == "Text":
         df[column] = df[column].astype(str)
         st.write(f"Column '{column}' formatted as Text.")
@@ -141,19 +138,16 @@ def display_statistics_numeric(df, column):
     q75 = col_data.quantile(0.75)
     
     col1, col2, col3 = st.columns([1, 1, 1])
-      
     with col1:
         st.metric(label="Sum", value=f"{total_sum:,.2f}")
         st.metric(label="Median", value=f"{median_val:,.2f}")
         st.metric(label="Min", value=f"{min_val:,.2f}")
         st.metric(label="25th Percentile", value=f"{q25:,.2f}")
-      
     with col2:
         st.metric(label="Mean", value=f"{mean_val:,.2f}")
         st.metric(label="Std Dev", value=f"{std_dev:,.2f}")
         st.metric(label="Max", value=f"{max_val:,.2f}")
         st.metric(label="75th Percentile", value=f"{q75:,.2f}")
-    
     with col3:
         fig = px.histogram(col_data.dropna(), nbins=20, title=f'Histogram of {column}')
         fig.update_layout(xaxis_title='Value', yaxis_title='Frequency')
@@ -170,33 +164,28 @@ def display_statistics_text(df, column):
     distinct_percentage = (distinct_values / total_values) * 100
     
     col1, col2, col3 = st.columns([1, 1, 1])
-    
     with col1:
         top_values = col_data.value_counts().head(5)
         fig_pie = px.pie(values=top_values.values, names=top_values.index, title="Top 5 Most Frequent Values")
         st.plotly_chart(fig_pie)
-    
     with col2:
         labels = ['Unique Values', 'Distinct Values']
         values = [unique_values, distinct_values]
         percentages = [unique_percentage, distinct_percentage]
-        
         fig_bar = px.bar(x=labels, y=values, title='Bar Chart of Column Analysis', labels={'x': 'Category', 'y': 'Count'})
         fig_bar.update_traces(text=[f'{v} ({p:.2f}%)' for v, p in zip(values, percentages)], textposition='outside')
         st.plotly_chart(fig_bar)
-    
     with col3:
         with st.expander("Unique Values"):
             st.write(col_data.dropna().unique().tolist())
-        
         with st.expander("Distinct Values"):
             st.write(col_data.drop_duplicates().unique().tolist())
 
-# פונקציה לניתוח עמודה 
+# פונקציה לניתוח עמודה
 def analyze_column(df, column):
-    st.markdown(f"### Analysis of '{column}'", unsafe_allow_html=True)
-    
+    st.markdown("<h3 id='analyze-column'>Analyze Column</h3>", unsafe_allow_html=True)
     col_data = df[column]
+    
     if pd.api.types.is_numeric_dtype(col_data):
         display_statistics_numeric(df, column)
     elif pd.api.types.is_string_dtype(col_data):
@@ -209,8 +198,7 @@ def highlight_missing(val):
     return ''
 
 def show_missing_data(df):
-    st.markdown("### Handling Missing Values", unsafe_allow_html=True)
-    
+    st.markdown("<h3 id='handling-missing-values'>Handling Missing Values</h3>", unsafe_allow_html=True)
     missing_data = df[df.isnull().any(axis=1) | (df == "").any(axis=1)]
     
     if not missing_data.empty:
@@ -218,23 +206,27 @@ def show_missing_data(df):
         st.dataframe(missing_data.style.applymap(highlight_missing), use_container_width=True)
     
     column = st.selectbox("Select column to fill missing values:", df.columns[df.isnull().any() | (df == "").any()])
-
     if column:
         if pd.api.types.is_numeric_dtype(df[column]):
             fill_option = st.selectbox("How would you like to fill the missing values?", ["Mean", "Median", "Mode", "Custom Value"])
+            if fill_option == "Mean":
+                df[column].fillna(df[column].mean(), inplace=True)
+            elif fill_option == "Median":
+                df[column].fillna(df[column].median(), inplace=True)
+            elif fill_option == "Mode":
+                df[column].fillna(df[column].mode()[0], inplace=True)
+            elif fill_option == "Custom Value":
+                custom_value = st.text_input("Enter custom value:")
+                if custom_value:
+                    df[column].fillna(custom_value, inplace=True)
         else:
             fill_option = st.selectbox("How would you like to fill the missing values?", ["Mode", "Custom Value"])
-        
-        if fill_option == "Mean" and pd.api.types.is_numeric_dtype(df[column]):
-            df[column].fillna(df[column].mean(), inplace=True)
-        elif fill_option == "Median" and pd.api.types.is_numeric_dtype(df[column]):
-            df[column].fillna(df[column].median(), inplace=True)
-        elif fill_option == "Mode":
-            df[column].fillna(df[column].mode()[0], inplace=True)
-        elif fill_option == "Custom Value":
-            custom_value = st.text_input("Enter custom value:")
-            if custom_value:
-                df[column].fillna(custom_value, inplace=True)
+            if fill_option == "Mode":
+                df[column].fillna(df[column].mode()[0], inplace=True)
+            elif fill_option == "Custom Value":
+                custom_value = st.text_input("Enter custom value:")
+                if custom_value:
+                    df[column].fillna(custom_value, inplace=True)
         
         st.write("### Data after handling missing values")
         st.dataframe(df, use_container_width=True)
@@ -246,7 +238,7 @@ if uploaded_file:
     df = pd.read_csv(uploaded_file)
     
     with st.expander("Data Preview", expanded=True):
-        st.markdown("### Data Preview", unsafe_allow_html=True)
+        st.markdown("<h3 id='data-preview'>Data Preview</h3>", unsafe_allow_html=True)
         df = apply_column_formats(df)
         st.dataframe(df, use_container_width=True)
 
@@ -256,12 +248,12 @@ if uploaded_file:
         analyze_column(df, column)
         show_missing_data(df)
 
-    # Sidebar Navigation
+    # Sidebar עם קישורים יופיע רק אחרי העלאת קובץ
     with st.sidebar:
         st.markdown("<h2 style='color:white;'>Navigation</h2>", unsafe_allow_html=True)
-        st.button("Change Column Format", on_click=lambda: st.write("Navigating to Change Column Format..."))
-        st.button("Analyze Column", on_click=lambda: st.write("Navigating to Analyze Column..."))
-        st.button("Handling Missing Values", on_click=lambda: st.write("Navigating to Handling Missing Values..."))
+        st.markdown("[Change Column Format](#change-column-format)", unsafe_allow_html=True)
+        st.markdown("[Analyze Column](#analyze-column)", unsafe_allow_html=True)
+        st.markdown("[Handling Missing Values](#handling-missing-values)", unsafe_allow_html=True)
         st.markdown("<hr>", unsafe_allow_html=True)
 
 else:
