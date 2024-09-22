@@ -215,7 +215,7 @@ def analyze_column(df, column):
 
 # פונקציה להצגת ערכים חסרים כולל ריקים ""
 def highlight_missing(val):
-    if pd.isnull(val) or val == " ":
+    if pd.isnull(val) or val == "":
         return 'background-color: #C43636'
     return ''
 
@@ -223,20 +223,24 @@ def show_missing_data(df):
     st.write("### Handling Missing Values", anchor="handling-missing-values")
     
     # התייחסות לערכים חסרים וריקים ""
-    missing_data = df[df.isnull().any(axis=1) | (df == " ").any(axis=1)]
+    missing_data = df[df.isnull().any(axis=1) | (df == "").any(axis=1)]
     
     if not missing_data.empty:
         st.write("Rows with Missing Values:")
         st.dataframe(missing_data.style.applymap(highlight_missing), use_container_width=True)
     
-    column = st.selectbox("Select column to fill missing values:", df.columns[df.isnull().any() | (df == " ").any()])
+    column = st.selectbox("Select column to fill missing values:", df.columns[df.isnull().any() | (df == "").any()])
 
+    # בדיקה אם העמודה היא מספרית או טקסטואלית לפני הצגת אפשרויות מילוי מתאימות
     if column:
-        fill_option = st.selectbox("How would you like to fill the missing values?", ["Mean", "Median", "Mode", "Custom Value"])
+        if pd.api.types.is_numeric_dtype(df[column]):
+            fill_option = st.selectbox("How would you like to fill the missing values?", ["Mean", "Median", "Mode", "Custom Value"])
+        else:
+            fill_option = st.selectbox("How would you like to fill the missing values?", ["Mode", "Custom Value"])
         
-        if fill_option == "Mean":
+        if fill_option == "Mean" and pd.api.types.is_numeric_dtype(df[column]):
             df[column].fillna(df[column].mean(), inplace=True)
-        elif fill_option == "Median":
+        elif fill_option == "Median" and pd.api.types.is_numeric_dtype(df[column]):
             df[column].fillna(df[column].median(), inplace=True)
         elif fill_option == "Mode":
             df[column].fillna(df[column].mode()[0], inplace=True)
