@@ -69,7 +69,7 @@ def apply_column_formats(df):
 
 # פונקציה לשינוי פורמט עמודות
 def change_column_format(df, column):
-    st.write("### Change Column Format", anchor="change-column-format")
+    st.markdown("<h3 id='change-column-format'>Change Column Format</h3>", unsafe_allow_html=True)
     
     # בדיקה אם יש פורמט שנשמר כבר לעמודה
     current_format = st.session_state["column_formats"].get(column, "None")
@@ -202,9 +202,9 @@ def display_statistics_text(df, column):
 
 # פונקציה לניתוח עמודה 
 def analyze_column(df, column):
-    col_data = df[column]
-    st.write(f"### Analysis of '{column}'", anchor="analyze-column")
+    st.markdown(f"<h3 id='analyze-column'>Analysis of '{column}'</h3>", unsafe_allow_html=True)
     
+    col_data = df[column]
     if pd.api.types.is_numeric_dtype(col_data):
         # הצגת סטטיסטיקות וגרף היסטוגרמה עבור עמודות מספריות
         display_statistics_numeric(df, column)
@@ -220,7 +220,7 @@ def highlight_missing(val):
     return ''
 
 def show_missing_data(df):
-    st.write("### Handling Missing Values", anchor="handling-missing-values")
+    st.markdown("<h3 id='handling-missing-values'>Handling Missing Values</h3>", unsafe_allow_html=True)
     
     # התייחסות לערכים חסרים וריקים ""
     missing_data = df[df.isnull().any(axis=1) | (df == "").any(axis=1)]
@@ -259,7 +259,7 @@ if uploaded_file:
     df = pd.read_csv(uploaded_file)
     
     with st.expander("Data Preview", expanded=True):
-        st.write("### Data Preview")
+        st.markdown("<h3 id='data-preview'>Data Preview</h3>", unsafe_allow_html=True)
         df = apply_column_formats(df)  # יישום פורמטים שנשמרו
         st.dataframe(df, use_container_width=True)
 
@@ -274,7 +274,7 @@ if uploaded_file:
         st.markdown("<h2 style='color:white;'>Navigation</h2>", unsafe_allow_html=True)
         st.markdown("[Change Column Format](#change-column-format)", unsafe_allow_html=True)
         st.markdown("[Analyze Column](#analyze-column)", unsafe_allow_html=True)
-        st.markdown("[Handling Missing Vues](#handling-missing-values)", unsafe_allow_html=True)
+        st.markdown("[Handling Missing Values](#handling-missing-values)", unsafe_allow_html=True)
         st.markdown("<hr>", unsafe_allow_html=True)
 
 else:
