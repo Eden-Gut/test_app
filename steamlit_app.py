@@ -202,7 +202,7 @@ def display_statistics_text(df, column):
 
 # פונקציה לניתוח עמודה 
 def analyze_column(df, column):
-    st.markdown(f"<h3 id='analyze-column'>Analysis of '{column}'</h3>", unsafe_allow_html=True)
+    st.markdown(f"<h3 id='analyze-column'>Analysis of </h3>", unsafe_allow_html=True)
     
     col_data = df[column]
     if pd.api.types.is_numeric_dtype(col_data):
