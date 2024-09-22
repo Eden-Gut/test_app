@@ -36,7 +36,6 @@ st.markdown(
         background-color: #333333;
     }
 
-    /* עיצוב הכותרות ב-sidebar */
     .sidebar-link {
         color: #f5f5f5 !important;
         font-weight: bold;
@@ -69,12 +68,9 @@ def apply_column_formats(df):
 
 # פונקציה לשינוי פורמט עמודות
 def change_column_format(df, column):
-    st.markdown("<h3 id='change-column-format'>Change Column Format</h3>", unsafe_allow_html=True)
+    st.markdown("### Change Column Format", unsafe_allow_html=True)
     
-    # בדיקה אם יש פורמט שנשמר כבר לעמודה
     current_format = st.session_state["column_formats"].get(column, "None")
-    
-    # אפשרויות לפורמט עמודה
     format_options = ["None", "Currency", "Date", "Numeric", "Text"]
     format_choice = st.selectbox("Choose format:", format_options, index=format_options.index(current_format))
     
@@ -103,7 +99,6 @@ def change_column_format(df, column):
         df[column] = df[column].astype(str)
         st.write(f"Column '{column}' formatted as Text.")
     
-    # הוספת כפתורים במבנה ברור יותר עם מרווח להודעה
     save_col, download_col = st.columns([1, 1])
     with save_col:
         if st.button("Save Format"):
@@ -123,7 +118,6 @@ def change_column_format(df, column):
                 mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             )
     
-    # בחירת עמודות לסינון
     selected_columns = st.multiselect(
         "Filter columns",
         options=df.columns,
@@ -146,7 +140,6 @@ def display_statistics_numeric(df, column):
     q25 = col_data.quantile(0.25)
     q75 = col_data.quantile(0.75)
     
-    # חלוקה לשלוש עמודות: שתיים לסטטיסטיקות, אחת להיסטוגרמה
     col1, col2, col3 = st.columns([1, 1, 1])
       
     with col1:
@@ -176,7 +169,6 @@ def display_statistics_text(df, column):
     unique_percentage = (unique_values / total_values) * 100
     distinct_percentage = (distinct_values / total_values) * 100
     
-    # חלוקה לשלוש עמודות: גרף עוגה, גרף בר ו-expander
     col1, col2, col3 = st.columns([1, 1, 1])
     
     with col1:
@@ -202,15 +194,12 @@ def display_statistics_text(df, column):
 
 # פונקציה לניתוח עמודה 
 def analyze_column(df, column):
-    st.markdown(f"<h3 id='analyze-column'>Analysis of </h3>", unsafe_allow_html=True)
+    st.markdown(f"### Analysis of '{column}'", unsafe_allow_html=True)
     
     col_data = df[column]
     if pd.api.types.is_numeric_dtype(col_data):
-        # הצגת סטטיסטיקות וגרף היסטוגרמה עבור עמודות מספריות
         display_statistics_numeric(df, column)
-    
     elif pd.api.types.is_string_dtype(col_data):
-        # ניתוח עבור עמודות טקסטואליות
         display_statistics_text(df, column)
 
 # פונקציה להצגת ערכים חסרים כולל ריקים ""
@@ -220,9 +209,8 @@ def highlight_missing(val):
     return ''
 
 def show_missing_data(df):
-    st.markdown("<h3 id='handling-missing-values'>Handling Missing Values</h3>", unsafe_allow_html=True)
+    st.markdown("### Handling Missing Values", unsafe_allow_html=True)
     
-    # התייחסות לערכים חסרים וריקים ""
     missing_data = df[df.isnull().any(axis=1) | (df == "").any(axis=1)]
     
     if not missing_data.empty:
@@ -231,7 +219,6 @@ def show_missing_data(df):
     
     column = st.selectbox("Select column to fill missing values:", df.columns[df.isnull().any() | (df == "").any()])
 
-    # בדיקה אם העמודה היא מספרית או טקסטואלית לפני הצגת אפשרויות מילוי מתאימות
     if column:
         if pd.api.types.is_numeric_dtype(df[column]):
             fill_option = st.selectbox("How would you like to fill the missing values?", ["Mean", "Median", "Mode", "Custom Value"])
@@ -259,8 +246,8 @@ if uploaded_file:
     df = pd.read_csv(uploaded_file)
     
     with st.expander("Data Preview", expanded=True):
-        st.markdown("<h3 id='data-preview'>Data Preview</h3>", unsafe_allow_html=True)
-        df = apply_column_formats(df)  # יישום פורמטים שנשמרו
+        st.markdown("### Data Preview", unsafe_allow_html=True)
+        df = apply_column_formats(df)
         st.dataframe(df, use_container_width=True)
 
     column = st.selectbox("Select a column to analyze:", df.columns)
@@ -269,12 +256,12 @@ if uploaded_file:
         analyze_column(df, column)
         show_missing_data(df)
 
-    # Sidebar עם קישורים יופיע רק אחרי העלאת קובץ
+    # Sidebar Navigation
     with st.sidebar:
         st.markdown("<h2 style='color:white;'>Navigation</h2>", unsafe_allow_html=True)
-        st.markdown("[Change Column Format](#change-column-format)", unsafe_allow_html=True)
-        st.markdown("[Analyze Column](#analyze-column)", unsafe_allow_html=True)
-        st.markdown("[Handling Missing Values](#handling-missing-values)", unsafe_allow_html=True)
+        st.button("Change Column Format", on_click=lambda: st.write("Navigating to Change Column Format..."))
+        st.button("Analyze Column", on_click=lambda: st.write("Navigating to Analyze Column..."))
+        st.button("Handling Missing Values", on_click=lambda: st.write("Navigating to Handling Missing Values..."))
         st.markdown("<hr>", unsafe_allow_html=True)
 
 else:
