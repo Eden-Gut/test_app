@@ -241,13 +241,13 @@ if uploaded_file:
         show_missing_data(df)
 
     # Sidebar עם קישורים יופיע רק אחרי העלאת קובץ
- 
-        section={
-           section_one:"change_column_format"
+        with st.sidebar:
+            section={
+             section_one:"change_column_format"
             ,section_two:"analyze_column"
             ,section_three:"show_missing_data" }
-        st.sidebar.title("navigation")
-        selected_section = st.sidebar.radio("select section:", list(sections.keys()))
+            st.sidebar.title("navigation")
+            selected_section = st.sidebar.radio("select section:", list(sections.keys()))
 
         
 else:
