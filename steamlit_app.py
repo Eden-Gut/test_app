@@ -37,7 +37,7 @@ st.markdown(
     }
 
     .sidebar-link {
-        color: #f5f5f5 !important;
+        color: #f5555 !important;
         font-weight: bold;
         text-decoration: none !important;
 
