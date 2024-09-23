@@ -37,8 +37,8 @@ st.markdown(
     }
 
     a {
-        color: #ABB6C8 !important;
-        font-weight: bold;
+        color: #F0F2F6 !important;
+      
         text-decoration: none !important;
 
     }
