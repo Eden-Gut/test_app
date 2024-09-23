@@ -38,13 +38,12 @@ st.markdown(
 
     a {
         color: #F0F2F6 !important;
-      
         text-decoration: none !important;
 
     }
 
     a:hover {
-        color: #ffffff !important;
+        color: #f7f0c6 !important;
     }
     </style>
     """, unsafe_allow_html=True
