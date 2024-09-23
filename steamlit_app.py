@@ -226,16 +226,24 @@ def show_missing_data(df):
 # Expander להעלאת קובץ
 uploaded_file = st.file_uploader("Upload your CSV file", type=["csv"])
 
-if uploaded_file:
-    st.sidebar.title("navigation")
-    section={
-             section_one:"change_column_format"
-            ,section_two:"analyze_column"
-            ,section_three:"show_missing_data" }
-    
-    selected_section = st.sidebar.radio("select section:", list(sections.keys()))
+# הגדרות לסיידבר והצגת הודעה אם אין קובץ שהועלה
+st.sidebar.title("Navigation")
+if not uploaded_file:
+    st.sidebar.write("Upload a CSV file to enable navigation.")
+else:
+    # מילון הפונקציות לסיידבר
+    sections = {
+        "Change Column Format": change_column_format,
+        "Analyze Column": analyze_column,
+        "Show Missing Data": show_missing_data
+    }
+
+    # בחירת סקשן מתוך הסיידבר לאחר העלאת קובץ
+    selected_section = st.sidebar.radio("Select section:", list(sections.keys()))
+
+    # קריאה לפונקציות לאחר העלאת הקובץ
     df = pd.read_csv(uploaded_file)
-    
+
     with st.expander("Data Preview", expanded=True):
         st.markdown("<h3 id='data-preview'>Data Preview</h3>", unsafe_allow_html=True)
         df = apply_column_formats(df)
@@ -243,12 +251,5 @@ if uploaded_file:
 
     column = st.selectbox("Select a column to analyze:", df.columns)
     if column:
-        change_column_format(df, column)
-        analyze_column(df, column)
-        show_missing_data(df)
-
-    
-
-        
-else:
-    st.sidebar.write("Upload a CSV file to enable navigation.")
+        # קריאה לפונקציה הנבחרת מתוך הסיידבר
+        sections[selected_section](df, column)
