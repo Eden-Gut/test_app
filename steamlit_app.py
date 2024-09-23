@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
+import plotly.figure_factory as ff #למפת חום
 
 # הגדרת מצב תצוגה רחב
 st.set_page_config(layout="wide")
