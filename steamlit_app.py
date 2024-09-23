@@ -68,7 +68,7 @@ def apply_column_formats(df):
 
 # פונקציה לשינוי פורמט עמודות
 def change_column_format(df, column):
-    st.markdown("<h3 id='change-column-format'>Change Column Format</h3>", unsafe_allow_html=True)
+    st.header("change_column_format")
     
     current_format = st.session_state["column_formats"].get(column, "None")
     format_options = ["None", "Currency", "Date", "Numeric", "Text"]
@@ -106,15 +106,7 @@ def change_column_format(df, column):
         def convert_df_to_excel(df):
             return df.to_excel(index=False)
 
-        if st.button('Download Excel'):
-            excel_data = convert_df_to_excel(df)
-            st.download_button(
-                label="Download Excel file",
-                data=excel_data,
-                file_name='filtered_data.xlsx',
-                mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-            )
-    
+       
     selected_columns = st.multiselect(
         "Filter columns",
         options=df.columns,
@@ -183,7 +175,7 @@ def display_statistics_text(df, column):
 
 # פונקציה לניתוח עמודה
 def analyze_column(df, column):
-    st.markdown("<h3 id='analyze-column'>Analyze Column</h3>", unsafe_allow_html=True)
+    st.header("analyze_column")
     col_data = df[column]
     
     if pd.api.types.is_numeric_dtype(col_data):
@@ -198,7 +190,7 @@ def highlight_missing(val):
     return ''
 
 def show_missing_data(df):
-    st.markdown("<h3 id='handling-missing-values'>Handling Missing Values</h3>", unsafe_allow_html=True)
+    st.header("show_missing_data")
     missing_data = df[df.isnull().any(axis=1) | (df == "").any(axis=1)]
     
     if not missing_data.empty:
@@ -250,11 +242,13 @@ if uploaded_file:
 
     # Sidebar עם קישורים יופיע רק אחרי העלאת קובץ
     with st.sidebar:
-        st.markdown("<h2 style='color:white;'>Navigation</h2>", unsafe_allow_html=True)
-        st.markdown("[Change Column Format](#change-column-format)", unsafe_allow_html=True)
-        st.markdown("[Analyze Column](#analyze-column)", unsafe_allow_html=True)
-        st.markdown("[Handling Missing Values](#handling-missing-values)", unsafe_allow_html=True)
-        st.markdown("<hr>", unsafe_allow_html=True)
+        section={
+            ,section_one:"change_column_format"
+            ,section_two:"analyze_column"
+            ,section_three:"show_missing_data" }
+        st.sidebar.title("navigation")
+        selected_section = st.sidebar.radio("select section:", list(sections.keys()))
 
+        
 else:
     st.sidebar.write("Upload a CSV file to enable navigation.")
