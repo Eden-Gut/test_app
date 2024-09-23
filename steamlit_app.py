@@ -199,8 +199,7 @@ def analyze_column(df, column):
     
     if pd.api.types.is_numeric_dtype(col_data):
         display_statistics_numeric(df, column)
-    
-    elif pd.api.types.is_string_dtype(col_data) or pd.api.types.is_categorical_dtype(col_data):
+    elif pd.api.types.is_string_dtype(col_data):
         display_statistics_text(df, column)
 
 # פונקציה להצגת ערכים חסרים כולל ריקים ""
@@ -254,6 +253,7 @@ if uploaded_file:
         analyze_column(df, column)
         show_missing_data(df)
 
+    # Sidebar navigation links
     with st.sidebar:
         st.markdown("<h2 style='color:white;'>Navigation</h2>", unsafe_allow_html=True)
         st.markdown("[Change Column Format](#change-column-format)", unsafe_allow_html=True)
