@@ -116,7 +116,19 @@ def change_column_format(df, column):
 
     filtered_df = df[selected_columns]
     st.dataframe(filtered_df, use_container_width=True)
-
+# פונקציה להצגת מפת חום של מתאמים
+# פונקציה להצגת מפת חום של מתאמים
+def display_correlation_heatmap(df):
+    corr_matrix = df.corr()
+    fig = ff.create_annotated_heatmap(
+        z=corr_matrix.values,
+        x=list(corr_matrix.columns),
+        y=list(corr_matrix.columns),
+        annotation_text=corr_matrix.round(2).values,
+        colorscale='Viridis'
+    )
+    fig.update_layout(xaxis_title='Columns', yaxis_title='Columns')
+    st.plotly_chart(fig, use_container_width=True)
 # פונקציה להצגת סטטיסטיקות עבור עמודות מספריות
 def display_statistics_numeric(df, column):
     col_data = df[column]
@@ -129,7 +141,7 @@ def display_statistics_numeric(df, column):
     q25 = col_data.quantile(0.25)
     q75 = col_data.quantile(0.75)
     
-    col1, col2, col3 = st.columns([1, 1, 1])
+    col1, col2, col3, col4 = st.columns([0.5, 0.5, 1,1])
     with col1:
         st.metric(label="Sum", value=f"{total_sum:,.2f}")
         st.metric(label="Median", value=f"{median_val:,.2f}")
@@ -144,6 +156,11 @@ def display_statistics_numeric(df, column):
         fig = px.histogram(col_data.dropna(), nbins=20, title=f'Histogram of {column}')
         fig.update_layout(xaxis_title='Value', yaxis_title='Frequency')
         st.plotly_chart(fig)
+    with col4:
+        st.markdown(f"<h4>Correlation Heatmap for Numerical Columns</h4>", unsafe_allow_html=True)
+        numeric_df = df.select_dtypes(include=[np.number])
+        if not numeric_df.empty:
+            display_correlation_heatmap(numeric_df)
 
 # פונקציה להצגת סטטיסטיקות עבור עמודות טקסטואליות
 def display_statistics_text(df, column):
