@@ -227,6 +227,7 @@ def show_missing_data(df):
 uploaded_file = st.file_uploader("Upload your CSV file", type=["csv"])
 
 if uploaded_file:
+     st.sidebar.title("navigation")
     df = pd.read_csv(uploaded_file)
     
     with st.expander("Data Preview", expanded=True):
@@ -246,7 +247,7 @@ if uploaded_file:
              section_one:"change_column_format"
             ,section_two:"analyze_column"
             ,section_three:"show_missing_data" }
-    st.sidebar.title("navigation")
+    
     selected_section = st.sidebar.radio("select section:", list(sections.keys()))
 
         
