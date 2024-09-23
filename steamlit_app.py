@@ -228,6 +228,12 @@ uploaded_file = st.file_uploader("Upload your CSV file", type=["csv"])
 
 if uploaded_file:
     st.sidebar.title("navigation")
+    section={
+             section_one:"change_column_format"
+            ,section_two:"analyze_column"
+            ,section_three:"show_missing_data" }
+    
+    selected_section = st.sidebar.radio("select section:", list(sections.keys()))
     df = pd.read_csv(uploaded_file)
     
     with st.expander("Data Preview", expanded=True):
@@ -241,14 +247,7 @@ if uploaded_file:
         analyze_column(df, column)
         show_missing_data(df)
 
-    # Sidebar עם קישורים יופיע רק אחרי העלאת קובץ
-
-    section={
-             section_one:"change_column_format"
-            ,section_two:"analyze_column"
-            ,section_three:"show_missing_data" }
     
-    selected_section = st.sidebar.radio("select section:", list(sections.keys()))
 
         
 else:
