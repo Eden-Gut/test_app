@@ -2,8 +2,8 @@
 primaryColor = "#5D7599"
 backgroundColor = "#F0F2F6"
 secondaryBackgroundColor = "#FFFFFF"
-textColor = "#000000"
-font = "sans serif"
+textColor = "#333333"
+font = "Calibri"
 
 [layout]
 wide = true
