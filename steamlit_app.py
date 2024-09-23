@@ -243,7 +243,7 @@ if uploaded_file:
     # Sidebar עם קישורים יופיע רק אחרי העלאת קובץ
  
         section={
-            ,section_one:"change_column_format"
+           section_one:"change_column_format"
             ,section_two:"analyze_column"
             ,section_three:"show_missing_data" }
         st.sidebar.title("navigation")
