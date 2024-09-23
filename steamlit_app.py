@@ -188,7 +188,7 @@ def analyze_column(df, column):
     
     if pd.api.types.is_numeric_dtype(col_data):
         display_statistics_numeric(df, column)
-    elif pd.api.types.is_string_dtype(col_data) or  pd.api.types.is_categoriacal_dtype(col_data):
+    elif pd.api.types.is_string_dtype(col_data) or  pd.api.types.is_categorical_dtype(col_data):
         display_statistics_text(df, column)
 
 # פונקציה להצגת ערכים חסרים כולל ריקים ""
