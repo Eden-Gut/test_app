@@ -118,9 +118,14 @@ def change_column_format(df, column):
     filtered_df = df[selected_columns]
     st.dataframe(filtered_df, use_container_width=True)
 # פונקציה להצגת מפת חום של מתאמים
-# פונקציה להצגת מפת חום של מתאמים
 def display_correlation_heatmap(df):
-    corr_matrix = df.corr()
+    # סינון עמודות מספריות בלבד
+    numeric_df = df.select_dtypes(include=['number'])
+    
+    # חישוב מטריצת המתאמים
+    corr_matrix = numeric_df.corr()
+    
+    # יצירת מפת חום עם Plotly
     fig = ff.create_annotated_heatmap(
         z=corr_matrix.values,
         x=list(corr_matrix.columns),
@@ -129,6 +134,8 @@ def display_correlation_heatmap(df):
         colorscale='Viridis'
     )
     fig.update_layout(xaxis_title='Columns', yaxis_title='Columns')
+    
+    # הצגת מפת החום ב-Streamlit
     st.plotly_chart(fig, use_container_width=True)
 # פונקציה להצגת סטטיסטיקות עבור עמודות מספריות
 def display_statistics_numeric(df, column):
