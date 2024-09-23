@@ -40,6 +40,7 @@ st.markdown(
         color: #f5f5f5 !important;
         font-weight: bold;
         text-decoration: none !important;
+        text-decoration: non  !important;
     }
 
     .sidebar-link:hover {
