@@ -241,7 +241,7 @@ if uploaded_file:
         show_missing_data(df)
 
     # Sidebar עם קישורים יופיע רק אחרי העלאת קובץ
-        with st.sidebar:
+    with st.sidebar:
             section={
              section_one:"change_column_format"
             ,section_two:"analyze_column"
