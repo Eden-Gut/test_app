@@ -37,7 +37,7 @@ st.markdown(
     }
 
     a {
-        color: #f5555 !important;
+        color: #C00000 !important;
         font-weight: bold;
         text-decoration: none !important;
 
