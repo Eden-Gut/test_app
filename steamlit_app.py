@@ -36,14 +36,14 @@ st.markdown(
         background-color: #333333;
     }
 
-    .sidebar-link {
+    a {
         color: #f5555 !important;
         font-weight: bold;
         text-decoration: none !important;
 
     }
 
-    .sidebar-link:hover {
+    a:hover {
         color: #ffffff !important;
     }
     </style>
