@@ -11,8 +11,8 @@ st.markdown(
     """
     <style>
     div[data-testid="stMetric"] {
-        # background-color: #f5f5f5;
-        border: 6px solid #5D7599;
+        background-color: #f5f5f5;
+        border: 2px solid #000000;
         padding: 10px;
         border-radius: 10px;
         color: black;
@@ -68,7 +68,7 @@ def apply_column_formats(df):
 
 # פונקציה לשינוי פורמט עמודות
 def change_column_format(df, column):
-    st.markdown("<h3 id='change-column-format'>Change Column Format</h3>", unsafe_allow_html=True)
+    st.header("change_column_format")
     
     current_format = st.session_state["column_formats"].get(column, "None")
     format_options = ["None", "Currency", "Date", "Numeric", "Text"]
@@ -175,7 +175,7 @@ def display_statistics_text(df, column):
 
 # פונקציה לניתוח עמודה
 def analyze_column(df, column):
-    st.markdown("<h3 id='analyze-column'>Analyze Column</h3>", unsafe_allow_html=True)
+    st.header("analyze_column")
     col_data = df[column]
     
     if pd.api.types.is_numeric_dtype(col_data):
@@ -190,7 +190,7 @@ def highlight_missing(val):
     return ''
 
 def show_missing_data(df):
-    st.markdown("<h3 id='handling-missing-values'>Handling Missing Values</h3>", unsafe_allow_html=True)
+    st.header("show_missing_data")
     missing_data = df[df.isnull().any(axis=1) | (df == "").any(axis=1)]
     
     if not missing_data.empty:
@@ -226,9 +226,24 @@ def show_missing_data(df):
 # Expander להעלאת קובץ
 uploaded_file = st.file_uploader("Upload your CSV file", type=["csv"])
 
-if uploaded_file:
+# הגדרות לסיידבר והצגת הודעה אם אין קובץ שהועלה
+st.sidebar.title("Navigation")
+if not uploaded_file:
+    st.sidebar.write("Upload a CSV file to enable navigation.")
+else:
+    # מילון הפונקציות לסיידבר
+    sections = {
+        "Change Column Format": change_column_format,
+        "Analyze Column": analyze_column,
+        "Show Missing Data": show_missing_data
+    }
+
+    # בחירת סקשן מתוך הסיידבר לאחר העלאת קובץ
+    selected_section = st.sidebar.radio("Select section:", list(sections.keys()))
+
+    # קריאה לפונקציות לאחר העלאת הקובץ
     df = pd.read_csv(uploaded_file)
-    
+
     with st.expander("Data Preview", expanded=True):
         st.markdown("<h3 id='data-preview'>Data Preview</h3>", unsafe_allow_html=True)
         df = apply_column_formats(df)
@@ -236,17 +251,5 @@ if uploaded_file:
 
     column = st.selectbox("Select a column to analyze:", df.columns)
     if column:
-        change_column_format(df, column)
-        analyze_column(df, column)
-        show_missing_data(df)
-
-    # Sidebar עם קישורים יופיע רק אחרי העלאת קובץ
-    with st.sidebar:
-        st.markdown("<h2 style='color:white;'>Navigation</h2>", unsafe_allow_html=True)
-        st.markdown("[Change Column Format](#change-column-format)", unsafe_allow_html=True)
-        st.markdown("[Analyze Column](#analyze-column)", unsafe_allow_html=True)
-        st.markdown("[Handling Missing Values](#handling-missing-values)", unsafe_allow_html=True)
-        st.markdown("<hr>", unsafe_allow_html=True)
-
-else:
-    st.sidebar.write("Upload a CSV file to enable navigation.")
+        # קריאה לפונקציה הנבחרת מתוך הסיידבר
+        sections[selected_section](df, column)
