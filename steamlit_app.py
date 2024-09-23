@@ -53,30 +53,6 @@ st.markdown(
 if "column_formats" not in st.session_state:
     st.session_state["column_formats"] = {}
 
-# Sidebar navigation state management
-if "section" not in st.session_state:
-    st.session_state.section = "home"
-
-# Function to scroll to the selected section
-def navigate_to(section):
-    st.session_state.section = section
-
-# Sidebar with navigation
-with st.sidebar:
-    st.markdown("<h2 style='color:white;'>Navigation</h2>", unsafe_allow_html=True)
-    if st.button("Change Column Format"):
-        navigate_to("change_column_format")
-    if st.button("Analyze Column"):
-        navigate_to("analyze_column")
-    if st.button("Handling Missing Values"):
-        navigate_to("handling_missing_values")
-    st.markdown("<hr>", unsafe_allow_html=True)
-
-# Function to display section headers based on navigation
-def display_section_header(header_id, header_text):
-    if st.session_state.section == header_id:
-        st.markdown(f"<h3>{header_text}</h3>", unsafe_allow_html=True)
-
 # פונקציה ליישום הפורמטים על העמודות
 def apply_column_formats(df):
     for column, format_type in st.session_state["column_formats"].items():
@@ -92,7 +68,7 @@ def apply_column_formats(df):
 
 # פונקציה לשינוי פורמט עמודות
 def change_column_format(df, column):
-    display_section_header("change_column_format", "Change Column Format")
+    st.markdown("<h3 id='change-column-format'>Change Column Format</h3>", unsafe_allow_html=True)
     
     current_format = st.session_state["column_formats"].get(column, "None")
     format_options = ["None", "Currency", "Date", "Numeric", "Text"]
@@ -151,7 +127,6 @@ def change_column_format(df, column):
 
 # פונקציה להצגת סטטיסטיקות עבור עמודות מספריות
 def display_statistics_numeric(df, column):
-    display_section_header("analyze_column", "Analyze Column")
     col_data = df[column]
     total_sum = col_data.sum()
     mean_val = col_data.mean()
@@ -180,7 +155,6 @@ def display_statistics_numeric(df, column):
 
 # פונקציה להצגת סטטיסטיקות עבור עמודות טקסטואליות
 def display_statistics_text(df, column):
-    display_section_header("analyze_column", "Analyze Column")
     col_data = df[column]
     total_values = col_data.size
     unique_values = col_data.nunique()
@@ -209,7 +183,7 @@ def display_statistics_text(df, column):
 
 # פונקציה לניתוח עמודה
 def analyze_column(df, column):
-    display_section_header("analyze_column", "Analyze Column")
+    st.markdown("<h3 id='analyze-column'>Analyze Column</h3>", unsafe_allow_html=True)
     col_data = df[column]
     
     if pd.api.types.is_numeric_dtype(col_data):
@@ -224,7 +198,7 @@ def highlight_missing(val):
     return ''
 
 def show_missing_data(df):
-    display_section_header("handling_missing_values", "Handling Missing Values")
+    st.markdown("<h3 id='handling-missing-values'>Handling Missing Values</h3>", unsafe_allow_html=True)
     missing_data = df[df.isnull().any(axis=1) | (df == "").any(axis=1)]
     
     if not missing_data.empty:
@@ -264,7 +238,7 @@ if uploaded_file:
     df = pd.read_csv(uploaded_file)
     
     with st.expander("Data Preview", expanded=True):
-        display_section_header("data_preview", "Data Preview")
+        st.markdown("<h3 id='data-preview'>Data Preview</h3>", unsafe_allow_html=True)
         df = apply_column_formats(df)
         st.dataframe(df, use_container_width=True)
 
@@ -273,6 +247,14 @@ if uploaded_file:
         change_column_format(df, column)
         analyze_column(df, column)
         show_missing_data(df)
+
+    # Sidebar עם קישורים יופיע רק אחרי העלאת קובץ
+    with st.sidebar:
+        st.markdown("<h2 style='color:white;'>Navigation</h2>", unsafe_allow_html=True)
+        st.markdown("[Change Column Format](#change-column-format)", unsafe_allow_html=True)
+        st.markdown("[Analyze Column](#analyze-column)", unsafe_allow_html=True)
+        st.markdown("[Handling Missing Values](#handling-missing-values)", unsafe_allow_html=True)
+        st.markdown("<hr>", unsafe_allow_html=True)
 
 else:
     st.sidebar.write("Upload a CSV file to enable navigation.")
