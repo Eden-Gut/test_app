@@ -23,7 +23,7 @@ st.markdown(
         justify-content: center;
         flex-direction: column;
     }
-    div[data-testid="stMetricLabel"] {
+    [data-testid="stMetricLabel"] {
         font-size: 4px;
         font-weight: bold;
         margin-bottom: 5px;
