@@ -11,8 +11,8 @@ st.set_page_config(layout="wide")
 st.markdown(
     """
     <style>
-    div[data-testid="stMetric"] {
-        # background-color: #f5f5f5;
+    /* Specific styling for metric labels and values */
+    div[data-testid="metric-container"] {
         border: 6px solid #5D7599;
         padding: 10px;
         border-radius: 10px;
@@ -23,27 +23,31 @@ st.markdown(
         justify-content: center;
         flex-direction: column;
     }
+    
     div[data-testid="stMetricLabel"] {
-        font-size: 4px;
+        font-size: 24px;  /* Adjust label size */
         font-weight: bold;
+        color: #F0F2F6 !important;
         margin-bottom: 5px;
-       
     }
+    
     div[data-testid="stMetricValue"] {
-        font-size: 24px;
+        font-size: 30px; /* Adjust value size */
         font-weight: bold;
     }
-
+    
+    /* Styling for the sidebar */
     section[data-testid="stSidebar"] {
         background-color: #333333;
     }
 
+    /* Styling for all links */
     a {
         color: #F0F2F6 !important;
         text-decoration: none !important;
-
     }
 
+    /* Hover effect for links */
     a:hover {
         color: #f7f0c6 !important;
     }
