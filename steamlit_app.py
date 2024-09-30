@@ -27,6 +27,7 @@ st.markdown(
         font-size: 18px;
         font-weight: bold;
        # margin-bottom: 5px;
+       color: #F0F2F6 !important;
     }
     div[data-testid="stMetricValue"] {
         font-size: 24px;
