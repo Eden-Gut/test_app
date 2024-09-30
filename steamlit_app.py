@@ -149,7 +149,7 @@ def display_statistics_numeric(df, column):
     q25 = col_data.quantile(0.25)
     q75 = col_data.quantile(0.75)
     
-    col1, col2, col3, col4 = st.columns([0.5, 0.5, 1,1])
+    col1, col2, col3, col4 = st.columns([0.3, 0.3, 1,1])
     with col1:
         st.metric(label="Sum", value=f"{total_sum:,.2f}")
         st.metric(label="Median", value=f"{median_val:,.2f}")
@@ -161,14 +161,16 @@ def display_statistics_numeric(df, column):
         st.metric(label="Max", value=f"{max_val:,.2f}")
         st.metric(label="75th Percentile", value=f"{q75:,.2f}")
     with col3:
-        fig = px.histogram(col_data.dropna(), nbins=20, title=f'Histogram of {column}')
-        fig.update_layout(xaxis_title='Value', yaxis_title='Frequency')
-        st.plotly_chart(fig)
+        histogram = px.histogram(col_data.dropna(), nbins=20, title=f'Histogram of {column}')
+        histogram.update_layout(xaxis_title='Value', yaxis_title='Frequency')
+        st.plotly_chart(histogram)
     with col4:
-        st.markdown(f"<h4>Correlation Heatmap for Numerical Columns</h4>", unsafe_allow_html=True)
-        numeric_df = df.select_dtypes(include=[np.number])
-        if not numeric_df.empty:
-            display_correlation_heatmap(numeric_df)
+        box_plot = px.box(df, y=column, title=f'Box Plot of {column} with Outliers')
+        st.plotly_chart(box_plot)
+        #st.markdown(f"<h4>Correlation Heatmap for Numerical Columns</h4>", unsafe_allow_html=True)
+       # numeric_df = df.select_dtypes(include=[np.number])
+       # if not numeric_df.empty:
+        #    display_correlation_heatmap(numeric_df)
 
 # פונקציה להצגת סטטיסטיקות עבור עמודות טקסטואליות
 def display_statistics_text(df, column):
