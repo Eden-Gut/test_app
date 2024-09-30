@@ -17,11 +17,12 @@ st.markdown(
         padding: 10px;
         border-radius: 10px;
         color: black;
-        margin-bottom: 20px;
+        margin-bottom: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-direction: column;
+        font-size: 30px;
     }
     [data-testid="stMetricLabel"] {
         font-size: 30px;
