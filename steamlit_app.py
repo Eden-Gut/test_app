@@ -24,7 +24,7 @@ st.markdown(
         flex-direction: column;
     }
     div[data-testid="stMetricLabel"] {
-        font-size: 18px;
+        font-size: 8px;
         font-weight: bold;
         margin-bottom: 5px;
        
