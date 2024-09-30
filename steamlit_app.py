@@ -12,7 +12,7 @@ st.markdown(
     """
     <style>
     {
-    font-size: 18px
+    font-size: 24px
     }
     div[data-testid="stMetric"] {
         # background-color: #f5f5f5;
