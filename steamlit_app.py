@@ -17,7 +17,7 @@ st.markdown(
         padding: 10px;
         border-radius: 10px;
         color: black;
-        margin-bottom: 10px;
+        margin-bottom: 20px;
         display: flex;
         align-items: center;
         justify-content: center;
