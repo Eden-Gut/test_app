@@ -24,12 +24,12 @@ st.markdown(
         flex-direction: column;
     }
     [data-testid="stMetricLabel"] {
-        font-size: 4px;
+        font-size: 30px;
         font-weight: bold;
         margin-bottom: 5px;
        
     }
-    div[data-testid="stMetricValue"] {
+   [data-testid="stMetricValue"] {
         font-size: 24px;
         font-weight: bold;
     }
