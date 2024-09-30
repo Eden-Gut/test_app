@@ -24,7 +24,7 @@ st.markdown(
         flex-direction: column;
     }
     div[data-testid="stMetricLabel"] {
-        font-size: 16px;
+        font-size: 18px;
         font-weight: bold;
         margin-bottom: 5px;
     }
@@ -162,10 +162,11 @@ def display_statistics_numeric(df, column):
         st.metric(label="75th Percentile", value=f"{q75:,.2f}")
     with col3:
         histogram = px.histogram(col_data.dropna(), nbins=20, title=f'Histogram of {column}')
-        histogram.update_layout(xaxis_title='Value', yaxis_title='Frequency')
+        histogram.update_layout(xaxis_title='Value', yaxis_title='Frequency', title_font=dict(size=24))
         st.plotly_chart(histogram)
     with col4:
         box_plot = px.box(df, y=column, title=f'Box Plot of {column} with Outliers')
+        box_plot.update_layout(title_font=dict(size=24)) 
         st.plotly_chart(box_plot)
         #st.markdown(f"<h4>Correlation Heatmap for Numerical Columns</h4>", unsafe_allow_html=True)
        # numeric_df = df.select_dtypes(include=[np.number])
