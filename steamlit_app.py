@@ -11,6 +11,9 @@ st.set_page_config(layout="wide")
 st.markdown(
     """
     <style>
+    {
+    font-size: 18px
+    }
     div[data-testid="stMetric"] {
         # background-color: #f5f5f5;
         border: 6px solid #5D7599;
