@@ -4,6 +4,7 @@ backgroundColor = "#F0F2F6"
 secondaryBackgroundColor = "#FFFFFF"
 textColor = "#333333"
 font = "Calibri"
+fontSize = 14
 
 [layout]
 wide = true
