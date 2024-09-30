@@ -29,7 +29,7 @@ st.markdown(
         margin-bottom: 5px;
     }
     div[data-testid="stMetricValue"] {
-        font-size: 24px;
+        font-size: 12px;
         font-weight: bold;
     }
 
